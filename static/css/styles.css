@@ -1,0 +1,50 @@
+/* Fundo da página */
+body {
+    background-color: #ebe5e1;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+}
+
+/* Estilização do container */
+.container {
+    text-align: center;
+}
+
+/* Texto inicial invisível e deslocado para baixo */
+.hidden {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 1s ease-out, transform 1s ease-out;
+}
+
+/* Quando a classe "show" for adicionada, o texto aparece suavemente */
+.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Estilização do botão */
+.btn {
+    display: inline-block;
+    padding: 12px 24px;
+    font-size: 18px;
+    color: white;
+    background-color: #4CAF50;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+    opacity: 0; /* Inicialmente invisível */
+    transform: translateY(20px);
+    transition: opacity 1s ease-out 0.5s, transform 1s ease-out 0.5s;
+}
+
+/* Quando a classe "show" for adicionada, o botão aparece */
+.btn.show {
+    opacity: 1;
+    transform: translateY(0);
+}
