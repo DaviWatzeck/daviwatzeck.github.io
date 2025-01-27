@@ -1,5 +1,6 @@
 import random
 import time
+from math import ceil
 
 # |‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|
 # |                                                      |
@@ -24,9 +25,9 @@ base_loot_chances = {
 }
 
 base_amounts = {
-    'gold': 10,
-    'hp_potion': 3,
-    'mp_potion': 2,
+    'gold': 5,
+    'hp_potion': 2,
+    'mp_potion': 1,
     'pedra_forja': 1,
     'pedra_ressureicao': 1
 }
@@ -49,12 +50,13 @@ current_mana = float(20)
 health_max = float(100)
 mana_max = float(20)
 strength = float(10)
-defense = float(10)
+defense = float(5)
 
 
 player_level = 1
+magic_level = 1
 xp = 0
-xp_next_level = 10
+xp_next_level = 50
 gold = 0
 hp_pot = 0
 mp_pot = 0
@@ -114,6 +116,7 @@ pedra_ressureicao = 0
 dano_arma = 0
 defesa_arma = 0
 chance_critico_arma = 0
+defense_boost = 0
 
 spells_learned = {
     "Ataque": [],
@@ -130,18 +133,56 @@ def create_monster_name():
 
 
 def create_monster_level():
-    if first_monster is True:
-        monster_level = random.randint(1, 1)
+    global player_level, strength, defense, health_max
+    if first_monster:
+        monster_level = 1
         hp_monster = random.randint(25, 30)
-        strength_monster = random.randint(1, 10)
-        defense_monster = random.randint(1, 10)
-        xp_monster = random.randint(50, 75)
+        strength_monster = random.randint(1, 5)
+        defense_monster = random.randint(1, 5)
+        xp_monster = random.randint(30, 50)
+
     else:
-        monster_level = random.randint(max(1, player_level - 2), player_level + 2)
-        hp_monster = random.randint(25, 50) * monster_level
-        strength_monster = random.randint(1, 15) * monster_level
-        defense_monster = random.randint(1, 15) * monster_level
-        xp_monster = random.randint(20, 50) * monster_level
+        # Definir a variação de nível com base no nível do jogador
+        if player_level < 5:
+            level_variation = [-1, 0, 1]  # Máximo de 1 nível acima
+        elif player_level < 10:
+            level_variation = [-1, 0, 1, 2]  # Máximo de 2 níveis acima
+        elif player_level < 15:
+            level_variation = [-1, 0, 1, 2, 3]  # Máximo de 3 níveis acima
+        else:
+            level_variation = [-1, 0, 1, 2, 3]  # Mantém até 3 níveis acima
+
+        monster_level = player_level + random.choice(level_variation)
+        monster_level = max(1, monster_level)  # Evita nível 0 ou negativo
+
+        # Balanceamento baseado na diferença de nível
+        level_difference = monster_level - player_level
+        if level_difference == 1:
+            percentual = 0.15  # Pequena vantagem para o monstro
+        elif level_difference == 2:
+            percentual = 0.25  # Monstro bem mais forte, mas ainda possível de vencer
+        elif level_difference == 3:
+            percentual = 0.35  # Monstro muito forte, mas com estratégia pode ser vencido
+        elif level_difference == -1:
+            percentual = -0.15  # Pequena desvantagem para o monstro
+        else:
+            percentual = 0  # Nível igual, sem ajustes
+
+        # Ajusta HP com base no percentual
+        hp_monster = round(health_max * (1 + percentual))
+        hp_monster = max(hp_monster, 20)  # Evita que fique muito fraco
+
+        # Ajusta Força
+        strength_monster = round(strength * (1 + percentual))
+        strength_monster = max(strength_monster, 3)  # Evita que fique fraco demais
+
+        # Ajusta Defesa
+        defense_monster = round(defense * (1 + percentual))
+        defense_monster = max(defense_monster, 3)  # Defesa mínima para não ser inútil
+
+        # XP ajustado com base no nível do monstro
+        base_xp = 30 if monster_level <= player_level else 50  # XP menor para monstros mais fracos, maior para mais fortes
+        xp_monster = round(base_xp * (1 + (0.1 * level_difference)))  # XP cresce conforme o desafio
     return monster_level, hp_monster, strength_monster, defense_monster, xp_monster
 
 
@@ -168,6 +209,7 @@ def generate_random_monster():
 def player_health_mana():
     global health_max, current_health
     global mana_max, current_mana
+    global player_name
 
     # Cálculo da barra de vida
     porcentagem_life = current_health / health_max
@@ -181,7 +223,7 @@ def player_health_mana():
     preenchimento_mana = int(tamanho_barra_mana * porcentagem_mana)
     barra_mana = "█" * preenchimento_mana + "░" * (tamanho_barra_mana - preenchimento_mana)
 
-    return f"Vida: [{barra_life}] {current_health}/{health_max}\nMana: [{barra_mana}] {current_mana}/{mana_max}"
+    return f"{player_name} Vida: [{barra_life}] {current_health:.2f}/{health_max:.2f}\n{player_name} Mana: [{barra_mana}] {current_mana:.2f}/{mana_max:.2f}"
 
 
 def generate_loot(monster_level):
@@ -201,6 +243,18 @@ def generate_loot(monster_level):
     return loot
 
 
+def view_status():
+    global defense, strength, health_max, mana_max, player_level
+    print(rf"╔═════════════════════════════════════╗")  # noqa 541
+    print(rf"║    Você        Armadura: {defense:.2f}      ║")
+    print(rf"║     O          Força:    {strength:.2f}      ║")
+    print(rf"║    /|\         Vida Máxima: {health_max:.2f}  ║")
+    print(rf"║   / | \        Mana Máxima: {mana_max:.2f}   ║")
+    print(rf"║    / \         Nível Magia: {magic_level}       ║")
+    print(rf"║   /   \        Nível:   {player_level}           ║")
+    print(rf"╚═════════════════════════════════════╝")  # noqa 541
+
+
 def format_item_name(item):
     # Formata o nome do item com base no tipo de item
     item_names = {
@@ -213,12 +267,13 @@ def format_item_name(item):
     return item_names.get(item, item.capitalize())
 
 
-def update_attributes(strength, defense, health_max, mana_max):
-    new_strength = strength * 1.05
-    new_defense = defense * 1.07
-    new_health_max = health_max * 1.12
-    new_mana_max = mana_max * 1.08
-    return new_strength, new_defense, new_health_max, new_mana_max
+def update_attributes(player_level, strength, defense, health_max, mana_max):
+    new_player_level = player_level + 1
+    new_strength = ceil((strength + ((strength * 0.0652) * 1.25)) * 100) / 100  # Aumento maior para dano (força)
+    new_defense = ceil((defense + ((defense * 0.025) * 1.25)) * 100) / 100  # Aumento menor para defesa
+    new_health_max = ceil((health_max + ((health_max * 0.1) * 0.84)) * 100) / 100  # Saúde com crescimento mais expressivo
+    new_mana_max = ceil((mana_max + ((mana_max * 0.075) * 1.12)) * 100) / 100  # Mana
+    return new_player_level, new_strength, new_defense, new_health_max, new_mana_max
 
 
 def player_name_choice():
@@ -337,8 +392,11 @@ def buy_itens():
 
 def backpack_itens():
     global armadura_equipada, arma_equipada, dano_arma, defesa_arma, strength, defense
+    global current_health, current_mana
+    global hp_pot, mp_pot
 
     while True:
+        time.sleep(2)
         print("\nEscolha o que deseja visualizar:")
         print("1. Ver armaduras")
         print("2. Ver armas")
@@ -433,6 +491,33 @@ def backpack_itens():
             # Mostrar poções
             print(f"\nPoções de vida: {hp_pot}")
             print(f"Poções de mana: {mp_pot}")
+            escolha3 = input("Usar alguma poção? (Sim/Não/Y/N): ").strip().upper()
+            if escolha3 in {'SIM', 'S', 'Y'}:
+                try:
+                    escolha_potion = input("Digite o número da poção (1/2): ").strip()
+                    if escolha_potion == '1':
+                        if hp_pot > 0:
+                            current_health += 20
+                            if current_health > health_max:
+                                current_health = health_max
+                            print(f"Você usou uma poção de vida. Agora você tem {current_health} pontos de vida.")
+                            hp_pot -= 1
+                        else:
+                            print("Você não possui poções de vida.")
+                    elif escolha_potion == '2':
+                        if mp_pot > 0:
+                            current_mana += 10
+                            if current_mana > mana_max:
+                                current_mana = mana_max
+                            print(f"Você usou uma poção de mana. Agora você tem {current_mana}.")
+                        else:
+                            print("Você não possui poções de mana.")
+                    else:
+                        print("Entrada inválida. Digite 1 ou 2.")
+                        continue
+                except ValueError:
+                    print("Entrada inválida. Digite 1 ou 2.")
+                    continue
 
         elif escolha == '4':
             break
@@ -463,11 +548,70 @@ def hunt():
     battle(monster_name, monster_level, hp_monster, strength_monster, defense_monster, xp_monster)
 
 
+def player_level_up(monster_name, xp_monster, monster_level):
+    global player_level, current_health, health_max, mana_max, current_health, current_mana
+    global strength, defense, defense_boost, strength_boost, xp_next_level, xp
+    global first_monster
+    global gold
+    global hp_pot, mp_pot, gold, pedra_forja, pedra_ressureicao
+    print(f'Você derrotou o {monster_name}!')
+    xp += xp_monster
+    print(f"Você ganhou {xp_monster} XP.")
+    time.sleep(1)
+    while True:
+        if xp >= xp_next_level:
+            if first_monster is True:
+                first_monster = False
+            print("Parabéns! Você subiu de nível!")
+            xp -= xp_next_level
+            xp_next_level = int(xp_next_level * 1.5)
+            new_player_level, new_strength, new_defense, new_health_max, new_mana_max = update_attributes(player_level, strength, defense, health_max, mana_max)
+            print("Seus atributos aumentaram:")
+            time.sleep(1)
+            print(f"\nLevel: {player_level} -> {new_player_level}")
+            time.sleep(1)
+            print(f"\nForça: {strength:.2f} -> {new_strength:.2f}")
+            time.sleep(1)
+            print(f"\nDefesa: {defense:.2f} -> {new_defense:.2f}")
+            time.sleep(1)
+            print(f"\nVida Máxima: {health_max:.2f} -> {new_health_max:.2f}")
+            time.sleep(1)
+            print(f"\nMana Máxima: {mana_max:.2f} -> {new_mana_max:.2f}")
+            time.sleep(2)
+            # Atualiza os atributos do jogador
+            player_level, strength, defense, health_max, mana_max = new_player_level, new_strength, new_defense, new_health_max, new_mana_max
+
+            # Depois que o jogador upa, sua vida e mana são restaurados
+            current_health = health_max
+            current_mana = mana_max
+        else:
+            break
+
+    loot = generate_loot(monster_level)
+    if loot != {}:
+        for item, amount in loot.items():
+            name = format_item_name(item)
+            print(f'Você encontrou {amount} {name}!')
+            if item == 'gold':
+                gold += amount
+            elif item == 'hp_potion':
+                hp_pot += amount
+            elif item == 'mp_potion':
+                mp_pot += amount
+            elif item == 'pedra_forja':
+                pedra_forja += amount
+            elif item == 'pedra_ressureicao':
+                pedra_ressureicao += amount
+    else:
+        print('O monstro não dropou nenhum item.')
+    time.sleep(1)
+
+
 def battle(monster_name, monster_level, hp_monster, strength_monster, defense_monster, xp_monster):
     global current_health, current_mana, health_max, mana_max
     global xp, xp_next_level
     global hp_pot, mp_pot, gold, pedra_forja, pedra_ressureicao
-    global defense, strength
+    global defense, defense_boost, strength
     global player_level
     global first_monster
     monster_visual = generate_random_monster()
@@ -514,6 +658,15 @@ def battle(monster_name, monster_level, hp_monster, strength_monster, defense_mo
         player_choice = input('').upper()
         if player_choice == '1':  # Atacar
             damage_dealt = round(float((random.randint(int(strength - 5), int(strength))) + (0.35 * strength)), 2)
+            if armas_atributos[arma_equipada]['chance_critico_arma'] > 0:
+                random_chance = round(random.uniform(0.1, 1.0), 1)
+
+                # Verifica se houve acerto crítico
+                if random_chance <= armas_atributos[arma_equipada]['chance_critico_arma']:
+                    crit_multiplier = 1 + armas_atributos[arma_equipada]['escalonamento_critico']
+                    damage_dealt = round(damage_dealt * crit_multiplier, 2)
+                    print("🔥 CRÍTICO! 🔥")
+
             if round(damage_dealt - (0.15 * defense_monster), 2) <= 0.00:
                 print('Você errou seu ataque.')
             else:
@@ -523,7 +676,7 @@ def battle(monster_name, monster_level, hp_monster, strength_monster, defense_mo
             time.sleep(1)
 
         elif player_choice == '2':  # Defender
-            defense_boost = random.randint(1, defense) + (0.25 * defense)
+            defense_boost = round(float((random.randint(int(defense - 5), int(defense))) + (0.35 * defense)), 2)
             print(f'Você se preparou para defender, aumentando sua defesa em {defense_boost}')
             defense += defense_boost
             rodada_monstro = True
@@ -565,51 +718,7 @@ def battle(monster_name, monster_level, hp_monster, strength_monster, defense_mo
             continue
 
         if current_health_monster <= 0.00:
-            print(f'Você derrotou o {monster_name}!')
-            xp += xp_monster
-            print(f"Você ganhou {xp_monster} XP.")
-            time.sleep(1)
-            if xp >= xp_next_level:
-                if first_monster is True:
-                    first_monster = False
-                print("Parabéns! Você subiu de nível!")
-                player_level += 1
-                xp -= xp_next_level
-                xp_next_level = int(xp_next_level * 1.5)
-                new_strength, new_defense, new_health_max, new_mana_max = update_attributes(strength, defense, health_max, mana_max)
-                print("Seus atributos aumentaram:")
-                time.sleep(1.5)
-                print(f"\nForça: {strength:.2f} -> {new_strength:.2f}")
-                time.sleep(1.5)
-                print(f"\nDefesa: {defense:.2f} -> {new_defense:.2f}")
-                time.sleep(1.5)
-                print(f"\nVida Máxima: {health_max:.2f} -> {new_health_max:.2f}")
-                time.sleep(1.5)
-                print(f"\nMana Máxima: {mana_max:.2f} -> {new_mana_max:.2f}")
-                time.sleep(2)
-                # Atualiza os atributos do jogador
-                strength, defense, health_max, mana_max = new_strength, new_defense, new_health_max, new_mana_max
-                current_health = health_max
-                current_mana = mana_max
-
-            loot = generate_loot(monster_level)
-            if loot != {}:
-                for item, amount in loot.items():
-                    name = format_item_name(item)
-                    print(f'Você encontrou {amount} {name}!')
-                    if item == 'gold':
-                        gold += amount
-                    elif item == 'hp_potion':
-                        hp_pot += amount
-                    elif item == 'mp_potion':
-                        mp_pot += amount
-                    elif item == 'pedra_forja':
-                        pedra_forja += amount
-                    elif item == 'pedra_ressureicao':
-                        pedra_ressureicao += amount
-            else:
-                print('O monstro não dropou nenhum item.')
-            time.sleep(1)
+            player_level_up(monster_name, xp_monster, monster_level)
             break
 
         else:
@@ -617,10 +726,12 @@ def battle(monster_name, monster_level, hp_monster, strength_monster, defense_mo
                 rodada_monstro = False
                 damage_dealt = round(float((random.randint(int(strength_monster - 5), int(strength_monster))) + (0.35 * strength_monster)), 2)
                 if round(damage_dealt - (0.15 * defense), 2) <= 0.00:
-                    print('Você desviou do ataque do monstro!')
+                    print('Você defendeu o ataque do monstro!')
                 else:
                     current_health -= round(damage_dealt - (0.15 * defense), 2)
                     print(f'O monstro atacou você, causando {round(damage_dealt - (0.15 * defense), 2)} de dano')
+                if defense_boost > 0:
+                    defense -= defense_boost
                 time.sleep(1)
 
         if current_health <= 0:
@@ -812,7 +923,7 @@ def church():
         def comprar_hp_mp(gold, hp_pot, mp_pot):
             global envenenamento, current_health, player_name, first_church
             while True:
-                if hp_pot >= 2 and mp_pot >= 2:
+                if globals()['hp_pot'] >= 2 and globals()['mp_pot'] >= 2:
                     first_church = False
                     print(f"{npc_trainer} Vejo que comprou as pot de vida e mana, vamos para o ultimo lugar, a Torre do conhecimento")
                     time.sleep(5)
@@ -841,8 +952,8 @@ def church():
                                     gold -= preco_hp_final
                                     print(f'Você comprou {escolha_1_1} poção(ões) de vida por {preco_hp_final}$')
                                     time.sleep(2)
-                                    hp_pot += escolha_1_1
-                                    print(f'Você agora tem {hp_pot} poção(ões) de vida')
+                                    globals()['hp_pot'] += escolha_1_1
+                                    print(f'Você agora tem {globals()['hp_pot']} poção(ões) de vida')
                                     time.sleep(2)
                                 else:
                                     print('Você não tem moedas de ouro suficientes')
@@ -853,8 +964,8 @@ def church():
                                 gold -= preco_hp_final
                                 print(f'Você comprou {escolha_1_1} poção(ões) de vida por {preco_hp_final}$')
                                 time.sleep(2)
-                                hp_pot += escolha_1_1
-                                print(f'Você agora tem {hp_pot} poção(ões) de vida')
+                                globals()['hp_pot'] += escolha_1_1
+                                print(f'Você agora tem {globals()['hp_pot']} poção(ões) de vida')
                                 time.sleep(2)
                             else:
                                 print('Você não tem moedas de ouro suficientes')
@@ -879,8 +990,8 @@ def church():
                                     gold -= preco_mp_final
                                     print(f'Você comprou {escolha_1_2} poção(ões) de mana por {preco_mp_final}$')
                                     time.sleep(2)
-                                    mp_pot += escolha_1_2
-                                    print(f'Você agora tem {mp_pot} poção(ões) de mana')
+                                    globals()['mp_pot'] += escolha_1_2
+                                    print(f'Você agora tem {globals()['mp_pot']} poção(ões) de mana')
                                     time.sleep(2)
                                 else:
                                     print('Você não tem moedas de ouro suficientes')
@@ -890,8 +1001,8 @@ def church():
                                 gold -= preco_mp_final
                                 print(f'Você comprou {escolha_1_2} poção(ões) de mana por {preco_mp_final}$')
                                 time.sleep(2)
-                                mp_pot += escolha_1_2
-                                print(f'Você agora tem {mp_pot} poção(ões) de mana')
+                                globals()['mp_pot'] += escolha_1_2
+                                print(f'Você agora tem {globals()['mp_pot']} poção(ões) de mana')
                                 time.sleep(2)
                             else:
                                 print('Você não tem moedas de ouro suficientes')
@@ -902,7 +1013,7 @@ def church():
                     time.sleep(2)
                     continue
                 elif escolha_1 == '3' and first_church is False:
-                    continue
+                    break
                 else:
                     print('Opção inválida')
                     continue
@@ -1117,7 +1228,7 @@ def maingame():
         elif escolha == '5':
             backpack_itens()
         elif escolha == '6':
-            ...
+            view_status()
         elif escolha == '7':
             hunt()
         else:
