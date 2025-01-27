@@ -191,3 +191,50 @@ body {
 .name-input::placeholder {
     color: gray;
 }
+
+/* Estilização da caixa de escolha */
+.choice-box {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 15px;
+    border-radius: 10px;
+}
+
+/* Estilização do texto da pergunta */
+.choice-question {
+    color: white;
+    font-size: 18px;
+    text-align: center;
+}
+
+/* Estilização dos botões */
+.choice-button {
+    padding: 10px 20px;
+    font-size: 18px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out, color 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.choice-button:first-of-type {
+    background-color: black;
+    margin: 12px;
+    color: white;
+    border: 2px solid white;
+}
+
+.choice-button:last-of-type {
+    background-color: black;
+    color: white;
+    border: 2px solid white;
+}
+
+.choice-button:hover {
+    opacity: 0.8;
+    background-color: #cfcece;
+    color: black;
+    transform: translateY(-5px);
+}

@@ -1,5 +1,6 @@
-let player_name = ''
-npc_trainer = 'Rashid:'
+let player_name = '';
+npc_trainer = 'Rashid:';
+village_name = 'Endcity';
 // Aguarda o carregamento da página
 document.addEventListener("DOMContentLoaded", function() {
     setTimeout(() => {
@@ -177,16 +178,87 @@ function createTopBox(imgSrc, messages, delay) {
     });
 }
 
+/**
+ * Cria uma caixa de escolha com dois botões e retorna a escolha do jogador.
+ * @param {string} question - Pergunta exibida na caixa de escolha.
+ * @param {string} option1 - Texto do botão 1.
+ * @param {string} option2 - Texto do botão 2.
+ * @returns {Promise<string>} - Retorna a escolha do jogador.
+ */
+function createChoiceBox(question, option1, option2) {
+    return new Promise((resolve) => {
+        let parent = document.querySelector(".game-screen");
+        if (!parent) return;
+
+        // Criar a caixa de escolha
+        let choiceBox = document.createElement("div");
+        choiceBox.classList.add("choice-box");
+
+        // Criar a pergunta
+        let questionText = document.createElement("p");
+        questionText.innerText = question;
+        questionText.classList.add("choice-question");
+
+        // Criar os botões
+        let button1 = document.createElement("button");
+        button1.innerText = option1;
+        button1.classList.add("choice-button");
+        button1.addEventListener("click", () => {
+            choiceBox.remove();
+            resolve(option1);
+        });
+
+        let button2 = document.createElement("button");
+        button2.innerText = option2;
+        button2.classList.add("choice-button");
+        button2.addEventListener("click", () => {
+            choiceBox.remove();
+            resolve(option2);
+        });
+
+        // Adicionar elementos à caixa de escolha
+        choiceBox.appendChild(questionText);
+        choiceBox.appendChild(button1);
+        choiceBox.appendChild(button2);
+
+        // Adicionar caixa de escolha à tela do jogo
+        parent.appendChild(choiceBox);
+    });
+}
+
 function sleep(segundos) {
     return new Promise(resolve => setTimeout(resolve, segundos * 1000));
 }
 
 async function gameplay() {
     await createTopBox("/static/pngs/npcs/Rashid.png", [
-        `Desconhecido: Olá! Seja bem vindo ${player_name} ao reino`,
+        `Desconhecido: Olá! Seja bem vindo ao reino, ${player_name}`,
         `${npc_trainer} Sou o Rashid, treinador da vila`,
         `${npc_trainer} Você deseja fazer o tutorial?`,
-    ], 3);
+    ], 5);
+    let escolha = await createChoiceBox("Deseja fazer o tutorial?", "Sim", "Não");
+
+    if (escolha === "Sim") {
+        tutorial_gameplay();
+    } else {
+        storygame();
+    }
+}
+
+async function tutorial_gameplay() {
+    await createTopBox("/static/pngs/npcs/Rashid.png", [
+        `${npc_trainer} Bom vamos lá... a ${village_name} foi fundada há 15 anos atrás...`,
+        `${npc_trainer} nosso glorioso ancião que fez tudo isso, ele continua construindo a nossa vila e permitindo que nossa raça evolua mais do que qualquer uma...`,
+        `${npc_trainer} como a vila é "Recém fundada", temos poucos lugares que você pode ir aqui, temos a Igreja, a Forja, a Loja de equipamentos e a Torre do conhecimento`,
+        `${npc_trainer} A igreja é um local onde você pode ser curado de envenenamentos e também poder comprar pots de cura e de mana`,
+        `${npc_trainer} A Forja é um lugar onde você pode melhorar seus equipamentos!`,
+        `${npc_trainer} A Loja de equipamentos é um lugar onde você pode comprar armaduras, escudos, e outros equipamentos`,
+        `${npc_trainer} A Torre do conhecimento é um lugar onde você pode conseguir aprender novas habilidades, sejam elas de suporte, de ataque e aumento de skills temporárias`,
+        `${npc_trainer} E por fim você pode ir para a floresta, onde você encontra inimigos, matando eles, eles tem incríveis loots sejam moedas de ouro, peças de armaduras, pots de vida e até mesmo pedras de ressureição. `,
+        `${npc_trainer} Você já está pronto para começar!`,
+    ], 10);
+    storygame()
+
 }
 
 async function principal_menu() {
@@ -198,7 +270,7 @@ async function principal_menu() {
         `Seja muito bem-vindo à vila, ${player_name}`,
         "Vamos começar a aventura!",
         "Alguem se aproxima de você..."
-    ], 3);
+    ], 5);
 
     gameplay();  // Inicia o jogo
 }
