@@ -7,6 +7,7 @@ body {
     align-items: center;
     height: 100vh;
     flex-direction: column;
+    font-family: 'IM Fell English SC', serif;
 }
 
 /* Estilização do container */
@@ -21,6 +22,10 @@ body {
     transition: opacity 1s ease-out, transform 1s ease-out;
 }
 
+.txt-inity {
+    font-size: 50px;
+}
+
 /* Quando a classe "show" for adicionada, o texto aparece suavemente */
 .show {
     opacity: 1;
@@ -32,19 +37,31 @@ body {
     display: inline-block;
     padding: 12px 24px;
     font-size: 18px;
-    color: white;
-    background-color: #4CAF50;
+    color: #000000;
+    background-color: #bdbdbd;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     margin-top: 20px;
     opacity: 0; /* Inicialmente invisível */
     transform: translateY(20px);
-    transition: opacity 1s ease-out 0.5s, transform 1s ease-out 0.5s;
+    transition: opacity 1s ease-out 0.5s, transform 1s ease-out;
+}
+
+.btn-popup {
+    font-size: 25px;
+    font-family: 'IM Fell English SC', serif;
 }
 
 /* Quando a classe "show" for adicionada, o botão aparece */
 .btn.show {
     opacity: 1;
     transform: translateY(0);
+}
+
+/* Efeito ao passar o mouse (hover) */
+.btn:hover {
+    transform: translateY(-5px); /* Sobe um pouco */
+    transition: transform 0.3s ease-in-out; /* Transição suave */
+    background-color: #cfcece; /* Altera a cor levemente */
 }
