@@ -8,11 +8,14 @@ body {
     height: 100vh;
     flex-direction: column;
     font-family: 'IM Fell English SC', serif;
+    transition: background-color 1s ease-out;
 }
 
 /* Estilização do container */
 .container {
     text-align: center;
+    position: relative;
+    transition: transform 1s ease-in-out, opacity 1s ease-in-out;
 }
 
 /* Texto inicial invisível e deslocado para baixo */
@@ -43,7 +46,7 @@ body {
     border-radius: 5px;
     cursor: pointer;
     margin-top: 20px;
-    opacity: 0; /* Inicialmente invisível */
+    opacity: 0;
     transform: translateY(20px);
     transition: opacity 1s ease-out 0.5s, transform 1s ease-out;
 }
@@ -61,7 +64,130 @@ body {
 
 /* Efeito ao passar o mouse (hover) */
 .btn:hover {
-    transform: translateY(-5px); /* Sobe um pouco */
-    transition: transform 0.3s ease-in-out; /* Transição suave */
-    background-color: #cfcece; /* Altera a cor levemente */
+    transform: translateY(-5px);
+    transition: transform 0.3s ease-in-out;
+    background-color: #cfcece;
+}
+
+/* Efeito ao desaparecer */
+.disappear {
+    transform: translateY(-100px);
+    opacity: 0;
+}
+
+/* Estilização da tela do jogo */
+.game-screen {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    height: 80%;
+    background-color: rgba(0, 0, 0, 0.9);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    flex-direction: column;
+}
+
+/* Quando a tela do jogo aparece */
+.game-screen.show {
+    opacity: 1;
+}
+
+/* Estilização do texto de boas-vindas */
+.welcome-text {
+    font-size: 24px;
+    text-align: center;
+    transition: opacity 1s ease-in-out;
+}
+
+/* Efeito de desaparecimento do texto */
+.fade-out {
+    opacity: 0;
+}
+
+/* Estilização da Top-Box */
+.top-box {
+    width: 90%;
+    height: 100px;
+    background-color: black;
+    border: 2px solid white;
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: white;
+    font-size: 18px;
+    padding: 10px;
+    transition: opacity 1s ease-in-out;
+}
+
+/* Quando a div aparece */
+.top-box.show {
+    opacity: 1;
+}
+
+/* Conteúdo dentro da Top-Box */
+.content-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Imagem do NPC */
+.npc-image {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid white;
+}
+
+/* Texto da Top-Box */
+.top-box-text {
+    flex-grow: 1;
+    font-size: 18px;
+    text-align: left;
+    font-family: 'IM Fell English SC', serif;
+}
+
+/* Botão de próxima fala */
+.next-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 10px;
+}
+
+.next-button:hover {
+    color: gray;
+}
+
+/* Input para nome do jogador */
+.name-input {
+    width: 60%;
+    padding: 10px;
+    font-size: 18px;
+    border-radius: 5px;
+    border: 1px solid white;
+    background-color: black;
+    color: white;
+    text-align: center;
+    outline: none;
+    margin-top: 10px;
+}
+
+.name-input::placeholder {
+    color: gray;
 }
