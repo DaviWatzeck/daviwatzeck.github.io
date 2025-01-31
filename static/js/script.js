@@ -1,6 +1,8 @@
-let player_name = '';
+let player_name = 'Mark';
 npc_trainer = 'Rashid:';
+npc_merchant = 'Flint:';
 village_name = 'Endcity';
+let gold = 0;
 // Aguarda o carregamento da página
 document.addEventListener("DOMContentLoaded", function() {
     setTimeout(() => {
@@ -46,7 +48,7 @@ document.querySelector(".btn").addEventListener("click", function() {
                     welcomeText.remove(); // Remove o texto após desaparecer
 
                     // Criar a div retangular no topo usando a função
-                    principal_menu();
+                    storygame();
 
                 }, 1000); // Tempo para fade-out completo
             }, 5000); // Tempo de exibição do texto
@@ -259,6 +261,209 @@ async function tutorial_gameplay() {
     ], 10);
     storygame()
 
+}
+
+async function storygame(){
+    await createTopBox("/static/pngs/npcs/Rashid.png", [
+        `${npc_trainer} Antes de começar, te darei 10 moedas de ouro para que você compre uma armadura e uma arma`,
+    ], 5);
+    gold += 10
+    await createTopBox("", [
+        `Você ganhou 10 de ouro`
+    ], 5);
+    await createTopBox("/static/pngs/npcs/Rashid.png", [
+        `${npc_trainer} Vamos ao conhecer o mercante agora!`,
+    ], 5);
+    buy_itens()
+    // print('Você saiu da loja de equipamentos...')
+    // print(f'{npc_trainer} Agora vamos equipar seus itens, {player_name}')
+    // backpack_itens()
+    // print(f'{npc_trainer} Agora você pode ir se aventurar na floresta')
+    // hunt()
+    // print(f'{npc_trainer} Ora ora... vejo que você se saiu muito bem!')
+    // print(f'{npc_trainer} Agora iremos visitar a forja')
+    // forge()
+    // print(f"{npc_trainer} Vamos conhecer a igreja agora")
+    // church()
+    // print(f'{npc_trainer} Agora, por ultimo, visitaremos a torre do conhecimento')
+    // print(f'{npc_trainer} Dizem que lá é um lugar com forças mágicas extremamente poderosas controladas por um......')
+    // print(f'{npc_trainer} PATO')
+    // print(f'{npc_trainer} ...')
+    // print(f'{npc_trainer} Pois é um pato kkkkk')
+    // print(f'{npc_trainer} Não me questione, questione o programador que fez isso')
+    // print(f'{npc_trainer} Enfim, vamos visitar a torre...')
+    // tower_of_knowledge()
+    // print(f'{npc_trainer} Você está pronto para se tornar um herói!')
+    // print(f'{npc_trainer} Esperamos que você seja um herói forte!')
+    // print(f'{npc_trainer} Agora você estará por conta própria')
+    // print(f'{npc_trainer} No seu nível 10, você pode enfrentar um boss')
+    // print(f'{npc_trainer} No seu nível 50, você pode enfrentar o boss final do jogo')
+    // print(f'{npc_trainer} Boa sorte!!!')
+    maingame()
+}
+
+async function buy_itens() {
+    let parent = document.querySelector(".game-screen");
+    if (!parent) return;
+
+    await createTopBox("", [
+        `Você entrou na loja de equipamentos...`,
+    ], 5);
+
+    await createTopBox("/static/pngs/npcs/Flint.png", [
+        `${npc_merchant} Fala meu guerreiro, tudo bem? O que deseja pra hoje?`,
+    ], 5);
+
+    let shopContainer = document.createElement("div");
+    shopContainer.classList.add("shop-container");
+
+    // Criando a área de exibição do ouro
+    let goldContainer = document.createElement("div");
+    goldContainer.classList.add("gold-container");
+
+    let goldAmount = document.createElement("span");
+    goldAmount.classList.add("gold-amount");
+    goldAmount.innerText = `Seu ouro: ${gold}g`; // Atualiza com a variável 'gold'
+
+    let goldIcon = document.createElement("img");
+    goldIcon.src = "/static/pngs/icons/gold.png"; // Ícone de ouro
+    goldIcon.classList.add("gold-icon");
+
+    goldContainer.appendChild(goldAmount);
+    goldContainer.appendChild(goldIcon);
+
+    let itemListContainer = document.createElement("div");
+    itemListContainer.classList.add("item-list-container");
+
+    let buttonContainer = document.createElement("div");
+    buttonContainer.classList.add("button-container");
+
+    // Criar botões de opções
+    let buyButton = document.createElement("button");
+    buyButton.innerText = "Comprar";
+    buyButton.classList.add("shop-button");
+    buyButton.disabled = true; // Inicialmente desativado
+
+    let exitButton = document.createElement("button");
+    exitButton.innerText = "Sair";
+    exitButton.classList.add("shop-button");
+    exitButton.addEventListener("click", () => {
+        shopContainer.remove();
+    });
+
+    buttonContainer.appendChild(buyButton);
+    buttonContainer.appendChild(exitButton);
+
+    shopContainer.appendChild(goldContainer); // Adiciona o ouro no topo
+    shopContainer.appendChild(itemListContainer);
+    shopContainer.appendChild(buttonContainer);
+    parent.appendChild(shopContainer);
+
+    // Exibir lista de itens imediatamente
+    showItemList(itemListContainer, buyButton, goldAmount);
+}
+
+function showItemList(parent, buyButton) {
+    let armas_atributos = {
+        'Peitoral lendário': {'defesa': 150},
+        'Clava lendária': {'ataque': 80, 'defesa': 80},
+        'Espada lendária': {'ataque': 70, 'defesa': 90},
+        'Machado lendário': {'ataque': 90, 'defesa': 65},
+        'Peitoral de ferro fundido': {'defesa': 80},
+        'Clava de titânio': {'ataque': 50, 'defesa': 50},
+        'Espada de titânio': {'ataque': 45, 'defesa': 50},
+        'Machado de titânio': {'ataque': 55, 'defesa': 40},
+        'Peitoral de aço': {'defesa': 40},
+        'Clava de ferro': {'ataque': 25, 'defesa': 25},
+        'Espada de ferro': {'ataque': 20, 'defesa': 30},
+        'Machado de ferro': {'ataque': 30, 'defesa': 20},
+        'Peitoral de ferro': {'defesa': 30},
+        'Clava de pedra': {'ataque': 10, 'defesa': 10},
+        'Espada de pedra': {'ataque': 8, 'defesa': 12},
+        'Machado de pedra': {'ataque': 12, 'defesa': 8},
+        'Peitoral de pano': {'defesa': 10},
+        'Clava de madeira': {'ataque': 5, 'defesa': 5},
+        'Espada de madeira': {'ataque': 4, 'defesa': 6},
+        'Machado de madeira': {'ataque': 6, 'defesa': 4}
+    };
+
+    let itens_disponiveis_npc_merchant = {
+        'Peitoral lendário': 180,
+        'Clava lendária': 150,
+        'Espada lendária': 150,
+        'Machado lendário': 150,
+        'Peitoral de ferro fundido': 105,
+        'Clava de titânio': 95,
+        'Espada de titânio': 95,
+        'Machado de titânio': 95,
+        'Peitoral de aço': 55,
+        'Clava de ferro': 45,
+        'Espada de ferro': 45,
+        'Machado de ferro': 45,
+        'Peitoral de ferro': 25,
+        'Clava de pedra': 15,
+        'Espada de pedra': 15,
+        'Machado de pedra': 15,
+        'Peitoral de pano': 5,
+        'Clava de madeira': 5,
+        'Espada de madeira': 5,
+        'Machado de madeira': 5
+    };
+
+    function getItemCategory(itemName) {
+        if (itemName.includes("Espada")) return "swords";
+        if (itemName.includes("Clava")) return "club's";
+        if (itemName.includes("Machado")) return "axes";
+        if (itemName.includes("Peitoral")) return "armors";
+        return "misc"; // Categoria padrão para evitar erro
+    }
+
+    parent.innerHTML = ""; // Limpar lista antes de adicionar itens
+
+    Object.entries(itens_disponiveis_npc_merchant).forEach(([item, price]) => {
+        let attributes = armas_atributos[item] || {};
+        let category = getItemCategory(item);
+        let formattedItemName = item.replace(/\s+/g, '_');
+
+        let itemRow = document.createElement("div");
+        itemRow.classList.add("item-row");
+        itemRow.style.marginBottom = "10px";
+
+        let itemImg = document.createElement("img");
+        itemImg.src = `/static/pngs/weapons/${category}/${formattedItemName}.png`;
+        itemImg.classList.add("item-img");
+
+        let itemDetails = document.createElement("div");
+        itemDetails.classList.add("item-details");
+        itemDetails.innerHTML = `<strong>${item}</strong><br>
+            ${attributes.ataque ? "Ataque: " + attributes.ataque + "<br>" : ""}
+            ${attributes.defesa ? "Defesa: " + attributes.defesa + "<br>" : ""}`;
+
+        let itemPrice = document.createElement("div");
+        itemPrice.classList.add("item-price");
+        itemPrice.innerText = `${price}g`;
+
+        itemRow.appendChild(itemImg);
+        itemRow.appendChild(itemDetails);
+        itemRow.appendChild(itemPrice);
+        parent.appendChild(itemRow);
+
+        // Adicionando interação
+        itemRow.addEventListener("mouseenter", () => {
+            itemRow.classList.add("hover");
+        });
+
+        itemRow.addEventListener("mouseleave", () => {
+            itemRow.classList.remove("hover");
+        });
+
+        itemRow.addEventListener("click", () => {
+            // Remove a classe 'selected' de todos os itens antes de aplicar no clicado
+            document.querySelectorAll(".item-row").forEach(el => el.classList.remove("selected"));
+            itemRow.classList.add("selected");
+            buyButton.disabled = false; // Habilita o botão de compra
+        });
+    });
 }
 
 async function principal_menu() {
