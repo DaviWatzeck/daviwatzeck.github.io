@@ -63,9 +63,9 @@ mp_pot = 0
 
 armas_atributos = {
     'Peitoral lendário': {'defesa': 150},
-    'Clava de lendário': {'ataque': 80, 'defesa': 80, 'chance_critico_arma': 0, 'escalonamento_critico': 0},
-    'Espada de lendário': {'ataque': 70, 'defesa': 90, 'chance_critico_arma': 0, 'escalonamento_critico': 0},
-    'Machado de lendário': {'ataque': 90, 'defesa': 65, 'chance_critico_arma': 0, 'escalonamento_critico': 0},
+    'Clava lendária': {'ataque': 80, 'defesa': 80, 'chance_critico_arma': 0, 'escalonamento_critico': 0},
+    'Espada lendária': {'ataque': 70, 'defesa': 90, 'chance_critico_arma': 0, 'escalonamento_critico': 0},
+    'Machado lendário': {'ataque': 90, 'defesa': 65, 'chance_critico_arma': 0, 'escalonamento_critico': 0},
     'Peitoral de ferro fundido': {'defesa': 80},
     'Clava de titânio': {'ataque': 50, 'defesa': 50, 'chance_critico_arma': 0, 'escalonamento_critico': 0},
     'Espada de titânio': {'ataque': 45, 'defesa': 50, 'chance_critico_arma': 0, 'escalonamento_critico': 0},
@@ -86,10 +86,10 @@ armas_atributos = {
 
 
 itens_disponiveis_npc_merchant = {
-    'Peitoral de ferro lendário': 180,
-    'Clava de lendário': 150,
-    'Espada de lendário': 150,
-    'Machado de lendário': 150,
+    'Peitoral lendário': 180,
+    'Clava lendária': 150,
+    'Espada lendária': 150,
+    'Machado lendário': 150,
     'Peitoral de ferro fundido': 105,
     'Clava de titânio': 95,
     'Espada de titânio': 95,

@@ -2,6 +2,7 @@ let player_name = 'Mark';
 npc_trainer = 'Rashid:';
 npc_merchant = 'Flint:';
 village_name = 'Endcity';
+let Primeira_Compra = true;
 let gold = 0;
 // Aguarda o carregamento da página
 document.addEventListener("DOMContentLoaded", function() {
@@ -323,10 +324,10 @@ async function buy_itens() {
 
     let goldAmount = document.createElement("span");
     goldAmount.classList.add("gold-amount");
-    goldAmount.innerText = `Seu ouro: ${gold}g`; // Atualiza com a variável 'gold'
+    goldAmount.innerText = `Seu ouro: ${gold}g`;
 
     let goldIcon = document.createElement("img");
-    goldIcon.src = "/static/pngs/icons/gold.png"; // Ícone de ouro
+    goldIcon.src = "/static/pngs/icons/gold.png";
     goldIcon.classList.add("gold-icon");
 
     goldContainer.appendChild(goldAmount);
@@ -342,7 +343,7 @@ async function buy_itens() {
     let buyButton = document.createElement("button");
     buyButton.innerText = "Comprar";
     buyButton.classList.add("shop-button");
-    buyButton.disabled = true; // Inicialmente desativado
+    buyButton.disabled = true;
 
     let exitButton = document.createElement("button");
     exitButton.innerText = "Sair";
@@ -354,7 +355,7 @@ async function buy_itens() {
     buttonContainer.appendChild(buyButton);
     buttonContainer.appendChild(exitButton);
 
-    shopContainer.appendChild(goldContainer); // Adiciona o ouro no topo
+    shopContainer.appendChild(goldContainer);
     shopContainer.appendChild(itemListContainer);
     shopContainer.appendChild(buttonContainer);
     parent.appendChild(shopContainer);
@@ -363,15 +364,15 @@ async function buy_itens() {
     showItemList(itemListContainer, buyButton, goldAmount);
 }
 
-function showItemList(parent, buyButton) {
+function showItemList(parent, buyButton, goldDisplay) {
     let armas_atributos = {
         'Peitoral lendário': {'defesa': 150},
         'Clava lendária': {'ataque': 80, 'defesa': 80},
-        'Espada lendária': {'ataque': 70, 'defesa': 90},
+        'Espada lendária': {'ataque': 65, 'defesa': 90},
         'Machado lendário': {'ataque': 90, 'defesa': 65},
         'Peitoral de ferro fundido': {'defesa': 80},
         'Clava de titânio': {'ataque': 50, 'defesa': 50},
-        'Espada de titânio': {'ataque': 45, 'defesa': 50},
+        'Espada de titânio': {'ataque': 45, 'defesa': 55},
         'Machado de titânio': {'ataque': 55, 'defesa': 40},
         'Peitoral de aço': {'defesa': 40},
         'Clava de ferro': {'ataque': 25, 'defesa': 25},
@@ -415,18 +416,24 @@ function showItemList(parent, buyButton) {
         if (itemName.includes("Clava")) return "club's";
         if (itemName.includes("Machado")) return "axes";
         if (itemName.includes("Peitoral")) return "armors";
-        return "misc"; // Categoria padrão para evitar erro
+        return "misc";
     }
 
-    parent.innerHTML = ""; // Limpar lista antes de adicionar itens
+    parent.innerHTML = "";
 
     Object.entries(itens_disponiveis_npc_merchant).forEach(([item, price]) => {
+        if (Primeira_Compra && !(item.includes("madeira") || item.includes("Peitoral de pano"))) {
+            return;
+        }
+
         let attributes = armas_atributos[item] || {};
         let category = getItemCategory(item);
         let formattedItemName = item.replace(/\s+/g, '_');
 
         let itemRow = document.createElement("div");
         itemRow.classList.add("item-row");
+        itemRow.dataset.price = price;
+        itemRow.dataset.name = item;
         itemRow.style.marginBottom = "10px";
 
         let itemImg = document.createElement("img");
@@ -448,22 +455,89 @@ function showItemList(parent, buyButton) {
         itemRow.appendChild(itemPrice);
         parent.appendChild(itemRow);
 
-        // Adicionando interação
-        itemRow.addEventListener("mouseenter", () => {
-            itemRow.classList.add("hover");
-        });
-
-        itemRow.addEventListener("mouseleave", () => {
-            itemRow.classList.remove("hover");
-        });
+        itemRow.addEventListener("mouseenter", () => itemRow.classList.add("hover"));
+        itemRow.addEventListener("mouseleave", () => itemRow.classList.remove("hover"));
 
         itemRow.addEventListener("click", () => {
-            // Remove a classe 'selected' de todos os itens antes de aplicar no clicado
             document.querySelectorAll(".item-row").forEach(el => el.classList.remove("selected"));
             itemRow.classList.add("selected");
-            buyButton.disabled = false; // Habilita o botão de compra
+            buyButton.disabled = false;
+            buyButton.dataset.selectedItem = itemRow.dataset.name;
+            buyButton.dataset.selectedPrice = itemRow.dataset.price;
+            buyButton.dataset.selectedRow = itemRow;
         });
+
+        buyButton.onclick = () => {
+            let selectedItem = buyButton.dataset.selectedItem;
+            let selectedPrice = parseInt(buyButton.dataset.selectedPrice);
+            let selectedRow = document.querySelector(".item-row.selected");
+            showPurchaseConfirmation(selectedItem, selectedPrice, goldDisplay, buyButton, selectedRow, parent);
+        };
     });
+}
+
+function showPurchaseConfirmation(itemName, price, goldDisplay, buyButton, itemRow, parent) {
+    let existingPopup = document.querySelector(".popup-container");
+    if (existingPopup) existingPopup.remove();
+
+    let popup = document.createElement("div");
+    popup.classList.add("popup-container");
+    popup.innerHTML = `<p>Você quer comprar o <strong>${itemName}</strong> por <strong>${price}g</strong>?</p>`;
+
+    let buttonYes = document.createElement("button");
+    buttonYes.innerText = "Sim";
+    buttonYes.classList.add("popup-button");
+    buttonYes.addEventListener("click", () => {
+        if (gold >= price) {
+            gold -= price;
+            goldDisplay.innerText = `Seu ouro: ${gold}g`;
+            itemRow.remove(); // Remove o item da loja
+            popup.remove();
+            if (Primeira_Compra && itemName.includes("madeira")) {
+                // Se for Primeira_Compra e comprou uma arma de madeira, remove todas as outras armas de madeira
+                document.querySelectorAll(".item-row").forEach(row => {
+                    if (row.dataset.name.includes("madeira")) {
+                        row.remove();
+                    }
+                });
+            }
+            buyButton.disabled = true;
+        } else {
+            showPurchaseFail();
+        }
+    });
+
+    let buttonNo = document.createElement("button");
+    buttonNo.innerText = "Não";
+    buttonNo.classList.add("popup-button");
+    buttonNo.addEventListener("click", () => {
+        popup.remove();
+    });
+
+    popup.appendChild(buttonYes);
+    popup.appendChild(buttonNo);
+    document.querySelector(".game-screen").appendChild(popup);
+}
+
+function showPurchaseFail() {
+    let parent = document.querySelector(".game-screen");
+
+    let existingPopup = document.querySelector(".popup-container");
+    if (existingPopup) existingPopup.remove();
+
+    let popup = document.createElement("div");
+    popup.classList.add("popup-container");
+    popup.innerHTML = `<p>Você não tem <span style="color: yellow;">OURO</span> suficiente!</p>`;
+
+    let buttonOk = document.createElement("button");
+    buttonOk.innerText = "OK";
+    buttonOk.classList.add("popup-button");
+    buttonOk.addEventListener("click", () => {
+        popup.remove();
+    });
+
+    popup.appendChild(buttonOk);
+    parent.appendChild(popup);
 }
 
 async function principal_menu() {
