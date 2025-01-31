@@ -3,7 +3,30 @@ npc_trainer = 'Rashid:';
 npc_merchant = 'Flint:';
 village_name = 'Endcity';
 let Primeira_Compra = true;
+
+// Listas de inventário
+let armaduras_compradas = [];
+let armas_compradas = [];
+let armadura_equipada = null;
+let arma_equipada = null;
+
+let mana_max = 20.0;
+let current_mana = 20.0;
+
+let current_health = 100.0;
+let health_max = 100.0;
+
+let strength = 10.0;
+let defense = 5.0;
+
+let player_level = 1;
+let magic_level = 1;
+let xp = 0;
+let xp_next_level = 50;
+let hp_pot = 0;
+let mp_pot = 0;
 let gold = 0;
+
 // Aguarda o carregamento da página
 document.addEventListener("DOMContentLoaded", function() {
     setTimeout(() => {
@@ -63,7 +86,7 @@ document.querySelector(".btn").addEventListener("click", function() {
  * @param {string[]} messages - Lista de mensagens a serem exibidas uma por uma
  * @param {number} delay - Tempo em segundos antes de avançar automaticamente
  */
-function createTopBox(imgSrc, messages, delay) {
+async function createTopBox(imgSrc, messages, delay) {
     return new Promise((resolve) => {
         let parent = document.querySelector(".game-screen");
         if (!parent) return; // Se a tela do jogo não existir, não faz nada
@@ -275,10 +298,13 @@ async function storygame(){
     await createTopBox("/static/pngs/npcs/Rashid.png", [
         `${npc_trainer} Vamos ao conhecer o mercante agora!`,
     ], 5);
-    buy_itens()
-    // print('Você saiu da loja de equipamentos...')
-    // print(f'{npc_trainer} Agora vamos equipar seus itens, {player_name}')
-    // backpack_itens()
+    await buy_itens()
+    console.log("SAIU DA LOJA")
+    await createTopBox("", [`Você saiu da loja de equipamentos...`], 5);
+    await createTopBox("/static/pngs/npcs/Rashid.png", [
+        `${npc_trainer} Agora vamos equipar seus itens, ${player_name}`,
+    ], 5);
+    await backpack()
     // print(f'{npc_trainer} Agora você pode ir se aventurar na floresta')
     // hunt()
     // print(f'{npc_trainer} Ora ora... vejo que você se saiu muito bem!')
@@ -303,68 +329,65 @@ async function storygame(){
     maingame()
 }
 
-async function buy_itens() {
-    let parent = document.querySelector(".game-screen");
-    if (!parent) return;
+async function buy_itens() {  // ← Certifique-se de que está 'async'
+    return new Promise(async (resolve) => {
+        let parent = document.querySelector(".game-screen");
+        if (!parent) return resolve();
 
-    await createTopBox("", [
-        `Você entrou na loja de equipamentos...`,
-    ], 5);
+        await createTopBox("", [`Você entrou na loja de equipamentos...`], 5);
+        await createTopBox("/static/pngs/npcs/Flint.png", [
+            `${npc_merchant} Fala meu guerreiro, tudo bem? O que deseja pra hoje?`,
+        ], 5);
 
-    await createTopBox("/static/pngs/npcs/Flint.png", [
-        `${npc_merchant} Fala meu guerreiro, tudo bem? O que deseja pra hoje?`,
-    ], 5);
+        let shopContainer = document.createElement("div");
+        shopContainer.classList.add("shop-container");
 
-    let shopContainer = document.createElement("div");
-    shopContainer.classList.add("shop-container");
+        let goldContainer = document.createElement("div");
+        goldContainer.classList.add("gold-container");
 
-    // Criando a área de exibição do ouro
-    let goldContainer = document.createElement("div");
-    goldContainer.classList.add("gold-container");
+        let goldAmount = document.createElement("span");
+        goldAmount.classList.add("gold-amount");
+        goldAmount.innerText = `Seu ouro: ${gold}g`;
 
-    let goldAmount = document.createElement("span");
-    goldAmount.classList.add("gold-amount");
-    goldAmount.innerText = `Seu ouro: ${gold}g`;
+        let goldIcon = document.createElement("img");
+        goldIcon.src = "/static/pngs/icons/gold.png";
+        goldIcon.classList.add("gold-icon");
 
-    let goldIcon = document.createElement("img");
-    goldIcon.src = "/static/pngs/icons/gold.png";
-    goldIcon.classList.add("gold-icon");
+        goldContainer.appendChild(goldAmount);
+        goldContainer.appendChild(goldIcon);
 
-    goldContainer.appendChild(goldAmount);
-    goldContainer.appendChild(goldIcon);
+        let itemListContainer = document.createElement("div");
+        itemListContainer.classList.add("item-list-container");
 
-    let itemListContainer = document.createElement("div");
-    itemListContainer.classList.add("item-list-container");
+        let buttonContainer = document.createElement("div");
+        buttonContainer.classList.add("button-container");
 
-    let buttonContainer = document.createElement("div");
-    buttonContainer.classList.add("button-container");
+        let buyButton = document.createElement("button");
+        buyButton.innerText = "Comprar";
+        buyButton.classList.add("shop-button");
+        buyButton.disabled = true;
 
-    // Criar botões de opções
-    let buyButton = document.createElement("button");
-    buyButton.innerText = "Comprar";
-    buyButton.classList.add("shop-button");
-    buyButton.disabled = true;
+        let exitButton = document.createElement("button");
+        exitButton.innerText = "Sair";
+        exitButton.classList.add("shop-button");
+        exitButton.addEventListener("click", () => {
+            shopContainer.remove();
+            resolve(); // Só continua o código após o usuário clicar em sair
+        });
 
-    let exitButton = document.createElement("button");
-    exitButton.innerText = "Sair";
-    exitButton.classList.add("shop-button");
-    exitButton.addEventListener("click", () => {
-        shopContainer.remove();
+        buttonContainer.appendChild(buyButton);
+        buttonContainer.appendChild(exitButton);
+
+        shopContainer.appendChild(goldContainer);
+        shopContainer.appendChild(itemListContainer);
+        shopContainer.appendChild(buttonContainer);
+        parent.appendChild(shopContainer);
+
+        showItemList(itemListContainer, buyButton, goldAmount);
     });
-
-    buttonContainer.appendChild(buyButton);
-    buttonContainer.appendChild(exitButton);
-
-    shopContainer.appendChild(goldContainer);
-    shopContainer.appendChild(itemListContainer);
-    shopContainer.appendChild(buttonContainer);
-    parent.appendChild(shopContainer);
-
-    // Exibir lista de itens imediatamente
-    showItemList(itemListContainer, buyButton, goldAmount);
 }
 
-function showItemList(parent, buyButton, goldDisplay) {
+async function showItemList(parent, buyButton, goldDisplay) {
     let armas_atributos = {
         'Peitoral lendário': {'defesa': 150},
         'Clava lendária': {'ataque': 80, 'defesa': 80},
@@ -492,6 +515,13 @@ function showPurchaseConfirmation(itemName, price, goldDisplay, buyButton, itemR
             gold -= price;
             goldDisplay.innerText = `Seu ouro: ${gold}g`;
             itemRow.remove(); // Remove o item da loja
+
+            if (itemName.includes("Peitoral")) {
+                armaduras_compradas.push(itemName);
+            } else {
+                armas_compradas.push(itemName);
+            }
+
             popup.remove();
             if (Primeira_Compra && itemName.includes("madeira")) {
                 // Se for Primeira_Compra e comprou uma arma de madeira, remove todas as outras armas de madeira

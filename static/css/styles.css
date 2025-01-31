@@ -238,3 +238,175 @@ body {
     color: black;
     transform: translateY(-5px);
 }
+
+.shop-container {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    width: 350px;
+    height: 650px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #ffffff;
+    padding: 10px;
+    border-radius: 5px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 15px 0 0 50px;
+    font-family: 'IM Fell English SC', serif;
+}
+
+
+.shop-button {
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    background: #000000;
+    color: #ffffff;
+    border: 2px solid white;
+    width: 50%;
+    height: 50px;
+    font-family: 'IM Fell English SC', serif;
+    border-radius: 4px;
+    transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease, border 0.3s ease;
+}
+
+.shop-button:disabled {
+    background: #444;
+    color: #777;
+    cursor: not-allowed;
+}
+
+.shop-button:hover {
+    transform: translateY(-5px);
+    background: #ffffff;
+    color: #000000;
+}
+
+/* Hover */
+.shop-button:hover:not(:disabled) {
+    background: #ffffff;
+    color: #000000;
+}
+
+.shop-button:not(:hover) {
+    transform: translateY(0);
+}
+
+/* Lista de itens deve ocupar toda a área vermelha */
+.item-list-container {
+    flex-grow: 1;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.9);
+    border: 1px solid white;
+    padding: 10px;
+}
+
+.item-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px;
+    border-bottom: 1px solid white;
+    cursor: pointer; /* Indica que o item é clicável */
+    transition: background 0.3s ease-in-out;
+}
+
+.item-row.hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Efeito ao selecionar um item */
+.item-row.selected {
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Imagem do item */
+.item-img {
+    width: 90px;
+    height: 90px;
+    border-radius: 20%;
+    background: rgba(176, 196, 222, 0.2);
+}
+
+.item-details {
+    flex-grow: 1;
+    padding-left: 10px;
+    font-size: 14px;
+}
+
+.item-price {
+    font-weight: bold;
+    color: yellow;
+}
+
+.bottom-section {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+}
+
+/* Área de exibição do ouro */
+.gold-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 5px;
+    border-bottom: 1px solid white;
+    font-size: 16px;
+    color: yellow;
+}
+
+/* Ícone do ouro */
+.gold-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+}
+
+/* Quantidade de ouro */
+.gold-amount {
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.popup-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: black;
+    color: white;
+    border: 2px solid white;
+    padding: 20px;
+    text-align: center;
+    width: 300px;
+    border-radius: 10px;
+    font-family: 'IM Fell English SC', serif;
+    z-index: 1000;
+}
+
+.popup-button {
+    margin: 10px;
+    padding: 10px 20px;
+    background: white;
+    color: black;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+}
+
+.popup-button:hover {
+    background: gray;
+    color: white;
+}
