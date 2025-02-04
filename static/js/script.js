@@ -570,6 +570,73 @@ function showPurchaseFail() {
     parent.appendChild(popup);
 }
 
+async function backpack() {
+    let parent = document.querySelector(".game-screen");
+
+    let backpack = document.createElement("div");
+    backpack.classList.add("backpack-container");
+
+    let equipadosContainer = document.createElement("div");
+    equipadosContainer.classList.add("equipados-container");
+
+    let armaEquipadaContainer = document.createElement("div");
+    armaEquipadaContainer.classList.add("armaEquipada-container");
+
+    let armaduraEquipadaContainer = document.createElement("div");
+    armaduraEquipadaContainer.classList.add("armaduraEquipada-container");
+
+    let buttonArmas = document.createElement("div");
+    buttonArmas.classList.add("buttonArmas-container");
+
+    let buttonArmaduras = document.createElement("div");
+    buttonArmaduras.classList.add("buttonArmaduras-container");
+
+    let suprimentosContainer = document.createElement("div");
+    suprimentosContainer.classList.add("suprimentos-container");
+
+    let goldIcon = document.createElement("img");
+    goldIcon.src = "/static/pngs/icons/gold.png";
+    goldIcon.classList.add("gold-icon2");
+
+    let goldAmount = document.createElement("span");
+    goldAmount.classList.add("gold-amount");
+    goldAmount.innerText = `Seu ouro: ${gold}g`;
+
+    let HPPotImg = document.createElement("img");
+    HPPotImg.src = "/static/pngs/icons/HPPOT64px.png";
+    HPPotImg.classList.add("hp-potion");
+
+    let HPPot = document.createElement("span");
+    HPPot.classList.add("hp-amount");
+    HPPot.innerText = `HP POT: ${hp_pot}x`;
+
+
+    let MPPotImg = document.createElement("img");
+    MPPotImg.src = "/static/pngs/icons/MPPOT64px.png";
+    MPPotImg.classList.add("mp-potion");
+
+    let MPPot = document.createElement("span");
+    MPPot.classList.add("mp-amount");
+    MPPot.innerText = `MP POT: ${mp_pot}x`;
+
+    equipadosContainer.appendChild(armaEquipadaContainer);
+    equipadosContainer.appendChild(armaduraEquipadaContainer);
+
+    suprimentosContainer.appendChild(goldAmount);
+    suprimentosContainer.appendChild(goldIcon);
+    suprimentosContainer.appendChild(HPPot);
+    suprimentosContainer.appendChild(HPPotImg);
+    suprimentosContainer.appendChild(MPPot);
+    suprimentosContainer.appendChild(MPPotImg);
+
+    backpack.appendChild(equipadosContainer);
+    backpack.appendChild(buttonArmas);
+    backpack.appendChild(buttonArmaduras);
+    backpack.appendChild(suprimentosContainer);
+
+    parent.appendChild(backpack)
+}
+
 async function principal_menu() {
     await createTopBox("", [
         "Olá viajante, bem-vindo ao reino!",
