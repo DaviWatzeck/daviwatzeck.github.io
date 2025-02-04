@@ -411,15 +411,15 @@ body {
     color: white;
 }
 
+/* CSS DA BACKPACK */
 .backpack-container {
     position: absolute;
     right: 10px;
     top: 10px;
-    width: 550px;
-    height: 625px;
+    width: 570px;
+    height: 690px;
     background: rgba(0, 0, 0, 0.8);
     border: 2px solid #ffffff;
-    padding: 10px;
     border-radius: 5px;
     color: white;
     display: flex;
@@ -433,12 +433,8 @@ body {
     display: flex;
     justify-content: space-between;
     padding: 10px;
-    border: 2px white solid
-}
-
-.suprimentos-container .gold-amount{
-    font-size: 16px;
-    margin-top:auto
+    align-items: center;
+    border-top: 3px white solid;
 }
 
 .gold-icon2 {

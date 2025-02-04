@@ -37,6 +37,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
 // Evento de clique no botão "Iniciar"
 document.querySelector(".btn").addEventListener("click", function() {
+    // Desativa o botão para evitar múltiplos cliques
+    this.disabled = true;
+
     let container = document.querySelector(".container");
 
     // Adiciona classe para desaparecer suavemente e subir
@@ -78,6 +81,11 @@ document.querySelector(".btn").addEventListener("click", function() {
             }, 5000); // Tempo de exibição do texto
         }, 100);
     }, 1000); // Tempo para desaparecer completamente
+
+    // Reativa o botão após um tempo para permitir outro clique, se necessário
+    setTimeout(() => {
+        this.disabled = false;
+    }, 6000); // Tempo suficiente para a transição do jogo (ajustar conforme necessário)
 });
 
 /**
@@ -599,8 +607,8 @@ async function backpack() {
     goldIcon.classList.add("gold-icon2");
 
     let goldAmount = document.createElement("span");
-    goldAmount.classList.add("gold-amount");
-    goldAmount.innerText = `Seu ouro: ${gold}g`;
+    goldAmount.classList.add("gold-amount2");
+    goldAmount.innerText = `SEU OURO: ${gold}x`;
 
     let HPPotImg = document.createElement("img");
     HPPotImg.src = "/static/pngs/icons/HPPOT64px.png";
