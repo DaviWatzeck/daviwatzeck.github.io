@@ -579,6 +579,13 @@ function showPurchaseFail() {
 }
 
 async function backpack() {
+    function getItemCategory(itemName) {
+        if (itemName.includes("Espada")) return "swords";
+        if (itemName.includes("Clava")) return "club's";
+        if (itemName.includes("Machado")) return "axes";
+        if (itemName.includes("Peitoral")) return "armors";
+        return "misc";
+    }
     let parent = document.querySelector(".game-screen");
 
     let backpack = document.createElement("div");
@@ -589,9 +596,37 @@ async function backpack() {
 
     let armaEquipadaContainer = document.createElement("div");
     armaEquipadaContainer.classList.add("armaEquipada-container");
+    armaEquipadaContainer.innerText = `Arma Equipada:`;
+    armaEquipadaContainer.appendChild(document.createElement("br"));
+    let armaImg = document.createElement("img");
+    armaImg.classList.add("item-img");
+    armaEquipadaContainer.appendChild(armaImg);
+    if (arma_equipada != null) {
+        armaImg.src = `/static/pngs/weapons/${getItemCategory(arma_equipada)}/${arma_equipada.replace(/\s+/g, '_')}.png`;
+        armaEquipadaContainer.appendChild(document.createTextNode(arma_equipada.replaceAll("_", " ")));
+    }
+    else{
+        armaImg.src = `/static/pngs/icons/nothing.png`;
+        arma_equipada_text = 'Punhos';
+        armaEquipadaContainer.appendChild(document.createTextNode(arma_equipada_text));
+    }
 
     let armaduraEquipadaContainer = document.createElement("div");
     armaduraEquipadaContainer.classList.add("armaduraEquipada-container");
+    armaduraEquipadaContainer.innerText = `Armadura Equipada:`;
+    armaduraEquipadaContainer.appendChild(document.createElement("br"));
+    let armaduraImg = document.createElement("img");
+    armaduraImg.classList.add("item-img");
+    armaduraEquipadaContainer.appendChild(armaduraImg);
+    if (arma_equipada != null) {
+        armaduraImg.src = `/static/pngs/weapons/${getItemCategory(armadura_equipada)}/${armadura_equipada.replace(/\s+/g, '_')}.png`;
+        armaduraEquipadaContainer.appendChild(document.createTextNode(armadura_equipada.replaceAll("_", " ")));
+    }
+    else{
+        armaduraImg.src = `/static/pngs/icons/nothing.png`;
+        armadura_equipada_text = 'Pelado';
+        armaduraEquipadaContainer.appendChild(document.createTextNode(armadura_equipada_text));
+    }
 
     let buttonArmas = document.createElement("div");
     buttonArmas.classList.add("buttonArmas-container");

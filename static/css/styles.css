@@ -416,8 +416,8 @@ body {
     position: absolute;
     right: 10px;
     top: 10px;
+    bottom: 10px;
     width: 570px;
-    height: 690px;
     background: rgba(0, 0, 0, 0.8);
     border: 2px solid #ffffff;
     border-radius: 5px;
@@ -453,4 +453,18 @@ body {
     width: 35px;
     height: 35px;
     margin-right: 5px;
+}
+
+.armaEquipada-container {
+    width: 31%;
+    padding: 15px;
+    padding-right: 47px;
+    padding-left: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    border-right: 3px solid white;
+    border-bottom: 3px solid white;
 }
