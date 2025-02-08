@@ -243,8 +243,8 @@ body {
     position: absolute;
     left: 10px;
     top: 10px;
+    bottom: 20px;
     width: 350px;
-    height: 650px;
     background: rgba(0, 0, 0, 0.8);
     border: 2px solid #ffffff;
     padding: 10px;
@@ -416,7 +416,7 @@ body {
     position: absolute;
     right: 10px;
     top: 10px;
-    bottom: 10px;
+    bottom: 20px;
     width: 570px;
     background: rgba(0, 0, 0, 0.8);
     border: 2px solid #ffffff;
@@ -424,7 +424,6 @@ body {
     color: white;
     display: flex;
     flex-direction: column;
-    gap: 10px;
     margin: 15px 20px 0 50px;
     font-family: 'IM Fell English SC', serif;
 }
@@ -455,16 +454,46 @@ body {
     margin-right: 5px;
 }
 
+.equipados-container {
+    width: 100%;
+    display: flex;
+    border-bottom: 3px solid white;
+}
+
 .armaEquipada-container {
-    width: 31%;
-    padding: 15px;
-    padding-right: 47px;
-    padding-left: 50px;
+    width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
     border-right: 3px solid white;
-    border-bottom: 3px solid white;
+}
+
+.armaduraEquipada-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.buttonArmasContainer-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+}
+
+.buttonArmas-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    border-right: 3px solid white;
+}
+
+.buttonArmaduras-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
 }

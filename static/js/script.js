@@ -628,6 +628,9 @@ async function backpack() {
         armaduraEquipadaContainer.appendChild(document.createTextNode(armadura_equipada_text));
     }
 
+    let buttonArmasContainer = document.createElement("div");
+    buttonArmasContainer.classList.add("buttonArmasContainer-container");
+
     let buttonArmas = document.createElement("div");
     buttonArmas.classList.add("buttonArmas-container");
 
@@ -653,7 +656,6 @@ async function backpack() {
     HPPot.classList.add("hp-amount");
     HPPot.innerText = `HP POT: ${hp_pot}x`;
 
-
     let MPPotImg = document.createElement("img");
     MPPotImg.src = "/static/pngs/icons/MPPOT64px.png";
     MPPotImg.classList.add("mp-potion");
@@ -665,6 +667,9 @@ async function backpack() {
     equipadosContainer.appendChild(armaEquipadaContainer);
     equipadosContainer.appendChild(armaduraEquipadaContainer);
 
+    buttonArmasContainer.appendChild(buttonArmas);
+    buttonArmasContainer.appendChild(buttonArmaduras);
+
     suprimentosContainer.appendChild(goldAmount);
     suprimentosContainer.appendChild(goldIcon);
     suprimentosContainer.appendChild(HPPot);
@@ -673,8 +678,7 @@ async function backpack() {
     suprimentosContainer.appendChild(MPPotImg);
 
     backpack.appendChild(equipadosContainer);
-    backpack.appendChild(buttonArmas);
-    backpack.appendChild(buttonArmaduras);
+    backpack.appendChild(buttonArmasContainer);
     backpack.appendChild(suprimentosContainer);
 
     parent.appendChild(backpack)
