@@ -428,10 +428,8 @@ body {
     font-family: 'IM Fell English SC', serif;
 }
 .suprimentos-container{
-    margin-top:auto;
     display: flex;
-    justify-content: space-between;
-    padding: 10px;
+    justify-content: space-evenly;
     align-items: center;
     border-top: 3px white solid;
 }
@@ -452,6 +450,24 @@ body {
     width: 35px;
     height: 35px;
     margin-right: 5px;
+}
+
+.itens-qnt {
+    font-weight: bold;
+    font-size: 20px;
+    font-family: system-ui;
+}
+
+.gold-color {
+    color: yellow
+}
+
+.hp-color {
+    color: red
+}
+
+.mp-color {
+    color: #005bff
 }
 
 .equipados-container {
@@ -496,4 +512,79 @@ body {
     width: 100%;
     height: 100%;
     display: flex;
+}
+
+.icon-supply {
+    border-right: 2px solid white;
+    padding: 5px 10px 5px 5px;
+}
+
+.btArmasContainer {
+    width: 100%;
+    height: 100%;
+    background: black;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    transition: background 0.35s ease-in-out;
+}
+
+.btArmasContainer:hover {
+    background: rgba(255, 255, 255, 0.2); /* Fica um pouco mais claro ao passar o mouse */
+}
+
+.btArmasContainer span {
+    margin-top: 5px; /* Espaço entre imagem e texto */
+    font-size: 14px;
+    color: white;
+    text-align: center;
+    font-family: 'IM Fell English SC', serif;
+}
+
+.BackpackArmas-Container {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    bottom: 20px;
+    width: 570px;
+    background-color: rgb(0, 0, 0.8);
+    display: none;
+    z-index: 999;
+    border: 2px solid #ffffff;
+    border-radius: 5px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    margin: 15px 20px 0 50px;
+    opacity: 0;  /* Inicialmente invisível */
+    transition: opacity 0.5s ease-in-out;  /* Efeito de fade-in e fade-out */
+}
+
+/* Classe para quando a div for exibida */
+.BackpackArmas-Container.show {
+    opacity: 1;  /* Torna a div visível */
+}
+
+/* Botão de fechar a div */
+.close-btn {
+    position: absolute;
+    bottom: 45%;
+    right: 102%;
+    background-color:rgb(0, 0, 0.8);
+    color: white;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    font-size: 30px;
+    border-radius: 5px;
+    border: 2px solid white;
+     transition: background 0.2s ease-in-out;;
+}
+.close-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
 }

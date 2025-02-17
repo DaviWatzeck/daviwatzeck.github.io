@@ -2,6 +2,54 @@ let player_name = 'Mark';
 npc_trainer = 'Rashid:';
 npc_merchant = 'Flint:';
 village_name = 'Endcity';
+
+const armas_atributos = {
+    'Peitoral lendário': {'defesa': 150},
+    'Clava lendária': {'ataque': 80, 'defesa': 80},
+    'Espada lendária': {'ataque': 65, 'defesa': 90},
+    'Machado lendário': {'ataque': 90, 'defesa': 65},
+    'Peitoral de ferro fundido': {'defesa': 80},
+    'Clava de titânio': {'ataque': 50, 'defesa': 50},
+    'Espada de titânio': {'ataque': 45, 'defesa': 55},
+    'Machado de titânio': {'ataque': 55, 'defesa': 40},
+    'Peitoral de aço': {'defesa': 40},
+    'Clava de ferro': {'ataque': 25, 'defesa': 25},
+    'Espada de ferro': {'ataque': 20, 'defesa': 30},
+    'Machado de ferro': {'ataque': 30, 'defesa': 20},
+    'Peitoral de ferro': {'defesa': 30},
+    'Clava de pedra': {'ataque': 10, 'defesa': 10},
+    'Espada de pedra': {'ataque': 8, 'defesa': 12},
+    'Machado de pedra': {'ataque': 12, 'defesa': 8},
+    'Peitoral de pano': {'defesa': 10},
+    'Clava de madeira': {'ataque': 5, 'defesa': 5},
+    'Espada de madeira': {'ataque': 4, 'defesa': 6},
+    'Machado de madeira': {'ataque': 6, 'defesa': 4}
+};
+
+const armas_valores = {
+    'Peitoral lendário': 180,
+    'Clava lendária': 150,
+    'Espada lendária': 150,
+    'Machado lendário': 150,
+    'Peitoral de ferro fundido': 105,
+    'Clava de titânio': 95,
+    'Espada de titânio': 95,
+    'Machado de titânio': 95,
+    'Peitoral de aço': 55,
+    'Clava de ferro': 45,
+    'Espada de ferro': 45,
+    'Machado de ferro': 45,
+    'Peitoral de ferro': 25,
+    'Clava de pedra': 15,
+    'Espada de pedra': 15,
+    'Machado de pedra': 15,
+    'Peitoral de pano': 5,
+    'Clava de madeira': 5,
+    'Espada de madeira': 5,
+    'Machado de madeira': 5
+};
+
+
 let Primeira_Compra = true;
 
 // Listas de inventário
@@ -260,10 +308,6 @@ function createChoiceBox(question, option1, option2) {
     });
 }
 
-function sleep(segundos) {
-    return new Promise(resolve => setTimeout(resolve, segundos * 1000));
-}
-
 async function gameplay() {
     await createTopBox("/static/pngs/npcs/Rashid.png", [
         `Desconhecido: Olá! Seja bem vindo ao reino, ${player_name}`,
@@ -307,7 +351,6 @@ async function storygame(){
         `${npc_trainer} Vamos ao conhecer o mercante agora!`,
     ], 5);
     await buy_itens()
-    console.log("SAIU DA LOJA")
     await createTopBox("", [`Você saiu da loja de equipamentos...`], 5);
     await createTopBox("/static/pngs/npcs/Rashid.png", [
         `${npc_trainer} Agora vamos equipar seus itens, ${player_name}`,
@@ -337,7 +380,7 @@ async function storygame(){
     maingame()
 }
 
-async function buy_itens() {  // ← Certifique-se de que está 'async'
+async function buy_itens() {
     return new Promise(async (resolve) => {
         let parent = document.querySelector(".game-screen");
         if (!parent) return resolve();
@@ -396,63 +439,9 @@ async function buy_itens() {  // ← Certifique-se de que está 'async'
 }
 
 async function showItemList(parent, buyButton, goldDisplay) {
-    let armas_atributos = {
-        'Peitoral lendário': {'defesa': 150},
-        'Clava lendária': {'ataque': 80, 'defesa': 80},
-        'Espada lendária': {'ataque': 65, 'defesa': 90},
-        'Machado lendário': {'ataque': 90, 'defesa': 65},
-        'Peitoral de ferro fundido': {'defesa': 80},
-        'Clava de titânio': {'ataque': 50, 'defesa': 50},
-        'Espada de titânio': {'ataque': 45, 'defesa': 55},
-        'Machado de titânio': {'ataque': 55, 'defesa': 40},
-        'Peitoral de aço': {'defesa': 40},
-        'Clava de ferro': {'ataque': 25, 'defesa': 25},
-        'Espada de ferro': {'ataque': 20, 'defesa': 30},
-        'Machado de ferro': {'ataque': 30, 'defesa': 20},
-        'Peitoral de ferro': {'defesa': 30},
-        'Clava de pedra': {'ataque': 10, 'defesa': 10},
-        'Espada de pedra': {'ataque': 8, 'defesa': 12},
-        'Machado de pedra': {'ataque': 12, 'defesa': 8},
-        'Peitoral de pano': {'defesa': 10},
-        'Clava de madeira': {'ataque': 5, 'defesa': 5},
-        'Espada de madeira': {'ataque': 4, 'defesa': 6},
-        'Machado de madeira': {'ataque': 6, 'defesa': 4}
-    };
-
-    let itens_disponiveis_npc_merchant = {
-        'Peitoral lendário': 180,
-        'Clava lendária': 150,
-        'Espada lendária': 150,
-        'Machado lendário': 150,
-        'Peitoral de ferro fundido': 105,
-        'Clava de titânio': 95,
-        'Espada de titânio': 95,
-        'Machado de titânio': 95,
-        'Peitoral de aço': 55,
-        'Clava de ferro': 45,
-        'Espada de ferro': 45,
-        'Machado de ferro': 45,
-        'Peitoral de ferro': 25,
-        'Clava de pedra': 15,
-        'Espada de pedra': 15,
-        'Machado de pedra': 15,
-        'Peitoral de pano': 5,
-        'Clava de madeira': 5,
-        'Espada de madeira': 5,
-        'Machado de madeira': 5
-    };
-
-    function getItemCategory(itemName) {
-        if (itemName.includes("Espada")) return "swords";
-        if (itemName.includes("Clava")) return "club's";
-        if (itemName.includes("Machado")) return "axes";
-        if (itemName.includes("Peitoral")) return "armors";
-        return "misc";
-    }
-
     parent.innerHTML = "";
 
-    Object.entries(itens_disponiveis_npc_merchant).forEach(([item, price]) => {
+    Object.entries(armas_valores).forEach(([item, price]) => {
         if (Primeira_Compra && !(item.includes("madeira") || item.includes("Peitoral de pano"))) {
             return;
         }
@@ -578,14 +567,15 @@ function showPurchaseFail() {
     parent.appendChild(popup);
 }
 
+function getItemCategory(itemName) {
+    if (itemName.includes("Espada")) return "swords";
+    if (itemName.includes("Clava")) return "club's";
+    if (itemName.includes("Machado")) return "axes";
+    if (itemName.includes("Peitoral")) return "armors";
+    return "misc";
+}
+
 async function backpack() {
-    function getItemCategory(itemName) {
-        if (itemName.includes("Espada")) return "swords";
-        if (itemName.includes("Clava")) return "club's";
-        if (itemName.includes("Machado")) return "axes";
-        if (itemName.includes("Peitoral")) return "armors";
-        return "misc";
-    }
     let parent = document.querySelector(".game-screen");
 
     let backpack = document.createElement("div");
@@ -633,9 +623,35 @@ async function backpack() {
 
     let buttonArmas = document.createElement("div");
     buttonArmas.classList.add("buttonArmas-container");
+    buttonArmas.classList.add("containerBackpack-Weapons");
+
+    let btArmas = document.createElement("button");
+    btArmas.classList.add("btArmas-bt");
+    btArmas.classList.add("btArmasContainer");
+
+    let btArmasimg = document.createElement("img");
+    btArmasimg.classList.add("btArmasimg-bt");
+    btArmasimg.classList.add("item-img");
+    btArmasimg.src = `static/pngs/weapons/backpack/backpack-weapon.png`;
+
+    let btArmasSpan = document.createElement("span");
+    btArmasSpan.innerText = "ARMAS"
 
     let buttonArmaduras = document.createElement("div");
     buttonArmaduras.classList.add("buttonArmaduras-container");
+    buttonArmaduras.classList.add("containerBackpack-Weapons");
+
+    let btArmaduras = document.createElement("button");
+    btArmaduras.classList.add("btArmaduras-bt");
+    btArmaduras.classList.add("btArmasContainer");
+
+    let btArmadurasimg = document.createElement("img");
+    btArmadurasimg.classList.add("btArmadurasimg-bt");
+    btArmadurasimg.classList.add("item-img");
+    btArmadurasimg.src = `/static/pngs/weapons/backpack/backpack-armor.png`;
+
+    let btArmadurasSpan = document.createElement("span");
+    btArmadurasSpan.innerText = "ARMADURAS"
 
     let suprimentosContainer = document.createElement("div");
     suprimentosContainer.classList.add("suprimentos-container");
@@ -643,18 +659,34 @@ async function backpack() {
     let goldIcon = document.createElement("img");
     goldIcon.src = "/static/pngs/icons/gold.png";
     goldIcon.classList.add("gold-icon2");
+    goldIcon.classList.add("icon-supply");
 
     let goldAmount = document.createElement("span");
     goldAmount.classList.add("gold-amount2");
-    goldAmount.innerText = `SEU OURO: ${gold}x`;
+    goldAmount.innerText = `SEU OURO: `;
+
+    let goldValue = document.createElement("span");
+    goldValue.classList.add("itens-qnt");
+    goldValue.classList.add("gold-color");
+    goldValue.innerText = `${gold}x`;
+
+    goldAmount.appendChild(goldValue);
 
     let HPPotImg = document.createElement("img");
     HPPotImg.src = "/static/pngs/icons/HPPOT64px.png";
     HPPotImg.classList.add("hp-potion");
+    HPPotImg.classList.add("icon-supply");
 
     let HPPot = document.createElement("span");
     HPPot.classList.add("hp-amount");
-    HPPot.innerText = `HP POT: ${hp_pot}x`;
+    HPPot.innerText = `HP POT: `;
+
+    let hpvalue = document.createElement("span");
+    hpvalue.classList.add("itens-qnt");
+    hpvalue.classList.add("hp-color");
+    hpvalue.innerText = `${hp_pot}x`;
+
+    HPPot.appendChild(hpvalue);
 
     let MPPotImg = document.createElement("img");
     MPPotImg.src = "/static/pngs/icons/MPPOT64px.png";
@@ -662,13 +694,27 @@ async function backpack() {
 
     let MPPot = document.createElement("span");
     MPPot.classList.add("mp-amount");
-    MPPot.innerText = `MP POT: ${mp_pot}x`;
+    MPPot.innerText = `MP POT: `;
+
+    let mpvalue = document.createElement("span");
+    mpvalue.classList.add("itens-qnt");
+    mpvalue.classList.add("mp-color");
+    mpvalue.innerText = `${mp_pot}x`;
+
+    MPPot.appendChild(mpvalue);
 
     equipadosContainer.appendChild(armaEquipadaContainer);
     equipadosContainer.appendChild(armaduraEquipadaContainer);
 
     buttonArmasContainer.appendChild(buttonArmas);
     buttonArmasContainer.appendChild(buttonArmaduras);
+
+    buttonArmas.appendChild(btArmas)
+    buttonArmaduras.appendChild(btArmaduras)
+    btArmas.appendChild(btArmasimg)
+    btArmas.appendChild(btArmasSpan)
+    btArmaduras.appendChild(btArmadurasimg)
+    btArmaduras.appendChild(btArmadurasSpan)
 
     suprimentosContainer.appendChild(goldAmount);
     suprimentosContainer.appendChild(goldIcon);
@@ -682,6 +728,116 @@ async function backpack() {
     backpack.appendChild(suprimentosContainer);
 
     parent.appendChild(backpack)
+
+    let buttonArmasClick = document.querySelector(".btArmas-bt");
+
+    buttonArmasClick.addEventListener('click', async () => {
+
+        await BackpackArmas();
+    });
+}
+
+async function BackpackArmas() {
+    // Criação da div com a nova classe
+    let backpackarmas = document.createElement("div");
+    backpackarmas.classList.add("BackpackArmas-Container");
+
+    // Adiciona a div sobreposta ao "game-screen"
+    let parent = document.querySelector(".game-screen.show");
+    parent.appendChild(backpackarmas);
+
+    // Botão de Fechar
+    let closeBtn = document.createElement("button");
+    closeBtn.classList.add("close-btn");
+    closeBtn.innerText = "⤶";
+    backpackarmas.appendChild(closeBtn);
+
+    // Loop para adicionar os itens comprados à div
+    for (let item of armas_compradas) {
+        // Criação de uma nova div para cada item
+        let itemDiv = document.createElement("div");
+        itemDiv.style.borderBottom = "2px solid white";
+        itemDiv.style.display = "flex";
+        itemDiv.style.alignItems = "center";
+        itemDiv.style.padding = "10px";
+        itemDiv.style.flexDirection = "row";  // Garantir que a imagem e o texto fiquem ao lado
+
+        // Criação da imagem do item
+        let armaImg = document.createElement("img");
+        armaImg.classList.add("item-img");
+        armaImg.src = `/static/pngs/weapons/${getItemCategory(item)}/${item.replace(/\s+/g, '_')}.png`;
+
+        // Div para agrupar os textos (nome, ataque e defesa)
+        let textContainer = document.createElement("div");
+        textContainer.style.display = "flex";
+        textContainer.style.flexDirection = "column";  // Empilha os textos verticalmente
+        textContainer.style.marginLeft = "10px";  // Adiciona um espaçamento entre a imagem e o texto
+
+        // Nome do item com a classe 'WeaponArmor-ItemName'
+        let itemName = document.createElement("span");
+        itemName.classList.add("WeaponArmor-ItemName");
+        itemName.innerText = item;
+        textContainer.appendChild(itemName);
+
+        // Atributo Ataque com a classe 'WeaponArmor-Attributes'
+        let ataque = document.createElement("span");
+        ataque.classList.add("WeaponArmor-Attributes");
+        ataque.innerText = `Ataque: ${armas_atributos[item].ataque}`;
+        textContainer.appendChild(ataque);
+
+        // Atributo Defesa com a classe 'WeaponArmor-Attributes'
+        let defesa = document.createElement("span");
+        defesa.classList.add("WeaponArmor-Attributes");
+        defesa.innerText = `Defesa: ${armas_atributos[item].defesa}`;
+        textContainer.appendChild(defesa);
+
+        // Criação dos botões à direita
+        let buttonContainer = document.createElement("div");
+        buttonContainer.style.display = "flex";  // Alinha os botões horizontalmente
+        buttonContainer.style.marginLeft = "auto";  // Garante que os botões fiquem à direita
+        buttonContainer.style.flexDirection = "column";
+
+        // Botão "Equipar"
+        let equiparBtn = document.createElement("button");
+        equiparBtn.classList.add("equipar-btn");
+        equiparBtn.innerText = "Equipar";
+
+        // Botão "Detalhes"
+        let detalhesBtn = document.createElement("button");
+        detalhesBtn.classList.add("detalhes-btn");
+        detalhesBtn.innerText = "Detalhes";
+
+        // Botão "Comparar"
+        let compararBtn = document.createElement("button");
+        compararBtn.classList.add("comparar-btn");
+        compararBtn.innerText = "Comparar";
+
+        // Adiciona os botões à div
+        buttonContainer.appendChild(equiparBtn);
+        buttonContainer.appendChild(detalhesBtn);
+        buttonContainer.appendChild(compararBtn);
+
+        // Adiciona a imagem, o texto e os botões dentro da div do item
+        itemDiv.appendChild(armaImg);
+        itemDiv.appendChild(textContainer);
+        itemDiv.appendChild(buttonContainer);
+
+        // Adiciona o item à div principal BackpackArmas-Container
+        backpackarmas.appendChild(itemDiv);
+    }
+
+    // Adiciona o evento de clique para fechar a div
+    closeBtn.addEventListener('click', () => {
+        backpackarmas.classList.remove("show");  // Fade-out
+        setTimeout(() => {
+            backpackarmas.remove();  // Remove a div após o fade-out
+        }, 1000);  // A div será removida após 1 segundo
+    });
+
+    // Mostra a div sobreposta com efeito fade-in
+    setTimeout(() => {
+        backpackarmas.classList.add("show");
+    }, 10);  // O delay de 10ms é para garantir que a classe seja adicionada após a renderização inicial
 }
 
 async function principal_menu() {
@@ -689,13 +845,11 @@ async function principal_menu() {
         "Olá viajante, bem-vindo ao reino!",
         "Aqui você encontrará grandes aventuras.",
         "Está pronto para começar?",
-        "*INPUT_NOME*", // Aqui será exibido o input para digitar o nome
+        "*INPUT_NOME*",
         `Seja muito bem-vindo à vila, ${player_name}`,
         "Vamos começar a aventura!",
         "Alguem se aproxima de você..."
     ], 5);
 
-    gameplay();  // Inicia o jogo
+    gameplay();
 }
-
-// Iniciar o menu principal
