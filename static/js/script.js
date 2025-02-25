@@ -23,7 +23,9 @@ const armas_atributos = {
     'Peitoral de pano': {'defesa': 10},
     'Clava de madeira': {'ataque': 5, 'defesa': 5, 'chance_critico_arma': 0, 'escalonamento_critico': 0.5},
     'Espada de madeira': {'ataque': 4, 'defesa': 6, 'chance_critico_arma': 0, 'escalonamento_critico': 0.5},
-    'Machado de madeira': {'ataque': 6, 'defesa': 4, 'chance_critico_arma': 0, 'escalonamento_critico': 0.5}
+    'Machado de madeira': {'ataque': 6, 'defesa': 4, 'chance_critico_arma': 0, 'escalonamento_critico': 0.5},
+    'Punhos': {'ataque': 0, 'defesa': 0, 'chance_critico_arma': 0, 'escalonamento_critico': 0.0},
+    'Pelado': {'defesa': 4},
 };
 
 const armas_valores = {
@@ -55,8 +57,8 @@ let Primeira_Compra = true;
 // Listas de inventário
 let armaduras_compradas = [];
 let armas_compradas = [];
-let armadura_equipada = null;
-let arma_equipada = null;
+let armadura_equipada = 'Pelado';
+let arma_equipada = 'Punhos';
 
 let mana_max = 20.0;
 let current_mana = 20.0;
@@ -600,7 +602,7 @@ async function backpack() {
     let armaImgBackpack = document.createElement("img");
     armaImgBackpack.classList.add("item-img");
     armaEquipadaContainer.appendChild(armaImgBackpack);
-    if (arma_equipada != null) {
+    if (arma_equipada != 'Punhos') {
         armaImgBackpack.src = `/static/pngs/weapons/${getItemCategory(arma_equipada)}/${arma_equipada.replace(/\s+/g, '_')}.png`;
         armaEquipadaContainer.appendChild(document.createTextNode(arma_equipada.replaceAll("_", " ")));
     }
@@ -617,7 +619,7 @@ async function backpack() {
     let armaduraImgBackpack = document.createElement("img");
     armaduraImgBackpack.classList.add("item-img");
     armaduraEquipadaContainer.appendChild(armaduraImgBackpack);
-    if (armadura_equipada != null) {
+    if (armadura_equipada != 'Pelado') {
         armaduraImgBackpack.src = `/static/pngs/weapons/${getItemCategory(armadura_equipada)}/${armadura_equipada.replace(/\s+/g, '_')}.png`;
         armaduraEquipadaContainer.appendChild(document.createTextNode(armadura_equipada.replaceAll("_", " ")));
     }
@@ -812,14 +814,14 @@ async function BackpackArmas() {
             let allEquipButtons = document.querySelectorAll('.equipar-btn');
 
             if (arma_equipada === item) {
-                arma_equipada = null;
+                arma_equipada = 'Punhos';
                 equiparBtn.innerText = "Equipar";
 
                 // Remover atributos da arma equipada antes de desequipar
                 strength_player -= strength_weapon;
                 defense_player -= defense_weapon;
                 await updateImgBackpack(ArmaContainerBackpack, 'Punhos');
-            } else if (arma_equipada != item && arma_equipada != null) {
+            } else if (arma_equipada != item && arma_equipada != 'Punhos') {
                 // Guardar os valores da arma antiga antes de equipar a nova
                 let oldWeapon = arma_equipada;
                 let oldStrength = armas_atributos[oldWeapon]['ataque'];
@@ -967,6 +969,138 @@ async function DetalhesArmas(item) {
     }, 10);
 }
 
+async function CompararArmas(item) {
+    let Comparar = document.createElement("div");
+    Comparar.classList.add("Comparar-Container");
+
+    let parent = document.querySelector(".BackpackArmas-Container.show");
+    parent.appendChild(Comparar);
+
+    let closeBtn = document.createElement("button");
+    closeBtn.classList.add("close-btn");
+    closeBtn.innerText = "⤶";
+
+    let DivArmasContainer = document.createElement("div");
+    DivArmasContainer.classList.add("DivArmasContainer");
+
+    let DivArmaImgEquipado = document.createElement("div");
+    DivArmaImgEquipado.classList.add("DivArmaImgEquipado-Container");
+
+    let armaImgEquipado = document.createElement("img");
+    armaImgEquipado.classList.add("item-img-compare");
+    armaImgEquipado.src = `/static/pngs/weapons/${getItemCategory(item)}/${item.replace(/\s+/g, '_')}.png`;
+
+    let DivArmaImgCompare = document.createElement("div");
+    DivArmaImgCompare.classList.add("DivArmaImgCompare-Container");
+
+    let armaImgCompare = document.createElement("img");
+    armaImgCompare.classList.add("item-img-compare");
+    armaImgCompare.src = `/static/pngs/weapons/${getItemCategory(item)}/${item.replace(/\s+/g, '_')}.png`;
+
+    let DivStatusArmaEquipado = document.createElement("div");
+    DivStatusArmaEquipado.classList.add('DivStatusArmaEquipado-Container');
+
+    // Ataque
+    let DivStatusStrengthEquipado = document.createElement("div");
+    DivStatusStrengthEquipado.classList.add("StatusComparer");
+
+    let spanStrengthLabelEquipado = document.createElement("span");
+    spanStrengthLabelEquipado.innerHTML = `⚔️ Força: <span style="font-family: system-ui;">${armas_atributos[arma_equipada]['ataque']}</span>`;
+
+    // Defesa
+    let DivStatusDefenseEquipado = document.createElement("div");
+    DivStatusDefenseEquipado.classList.add("StatusComparer");
+
+    let spanDefenseLabelEquipado = document.createElement("span");
+    spanDefenseLabelEquipado.innerHTML = `🛡️ Defesa: <span style="font-family: system-ui;">${armas_atributos[arma_equipada]['defesa']}</span>`;
+
+    // Chance de Crítico
+    let DivStatusChanceCriticalEquipado = document.createElement("div");
+    DivStatusChanceCriticalEquipado.classList.add("StatusComparer");
+
+    let spanChanceCriticalLabelEquipado = document.createElement("span");
+    spanChanceCriticalLabelEquipado.innerHTML = `🎯 Chance Crítico: <span style="font-family: system-ui;">${armas_atributos[arma_equipada]['chance_critico_arma']}</span>%`;
+
+    // Escalonamento Crítico
+    let DivStatusCriticalPowerEquipado = document.createElement("div");
+    DivStatusCriticalPowerEquipado.classList.add("StatusComparer-last");
+
+    let spanCriticalPowerLabelEquipado = document.createElement("span");
+    spanCriticalPowerLabelEquipado.innerHTML = `💥 Escalonamento Crítico: <span style="font-family: system-ui;">${armas_atributos[arma_equipada]['escalonamento_critico']}</span>x`;
+
+    // DIV COMPARE
+    let DivStatusArmaCompare = document.createElement("div");
+    DivStatusArmaCompare.classList.add('DivStatusArmaCompare-Container');
+
+    // Ataque
+    let DivStatusStrengthCompare = document.createElement("div");
+    DivStatusStrengthCompare.classList.add("StatusComparer");
+
+    let spanStrengthLabelCompare = document.createElement("span");
+    spanStrengthLabelCompare.innerHTML = `⚔️ Força: <span style="font-family: system-ui;">${armas_atributos[item]['ataque']}</span>`;
+
+    // Defesa
+    let DivStatusDefenseCompare = document.createElement("div");
+    DivStatusDefenseCompare.classList.add("StatusComparer");
+
+    let spanDefenseLabelCompare = document.createElement("span");
+    spanDefenseLabelCompare.innerHTML = `🛡️ Defesa: <span style="font-family: system-ui;">${armas_atributos[item]['defesa']}</span>`;
+
+    // Chance de Crítico
+    let DivStatusChanceCriticalCompare = document.createElement("div");
+    DivStatusChanceCriticalCompare.classList.add("StatusComparer");
+
+    let spanChanceCriticalLabelCompare = document.createElement("span");
+    spanChanceCriticalLabelCompare.innerHTML = `🎯 Chance Crítico: <span style="font-family: system-ui;">${armas_atributos[item]['chance_critico_arma']}</span>%`;
+
+    // Escalonamento Crítico
+    let DivStatusCriticalPowerCompare = document.createElement("div");
+    DivStatusCriticalPowerCompare.classList.add("StatusComparer-last");
+
+    let spanCriticalPowerLabelCompare = document.createElement("span");
+    spanCriticalPowerLabelCompare.innerHTML = `💥 Escalonamento Crítico: <span style="font-family: system-ui;">${armas_atributos[item]['escalonamento_critico']}</span>x`;
+
+    let DivPaiEquipCompare = document.createElement('div');
+    DivPaiEquipCompare.classList.add('Status-Armas-Container')
+
+    DivStatusStrengthEquipado.appendChild(spanStrengthLabelEquipado);
+    DivStatusDefenseEquipado.appendChild(spanDefenseLabelEquipado);
+    DivStatusChanceCriticalEquipado.appendChild(spanChanceCriticalLabelEquipado);
+    DivStatusCriticalPowerEquipado.appendChild(spanCriticalPowerLabelEquipado);
+    DivStatusStrengthCompare.appendChild(spanStrengthLabelCompare);
+    DivStatusDefenseCompare.appendChild(spanDefenseLabelCompare);
+    DivStatusChanceCriticalCompare.appendChild(spanChanceCriticalLabelCompare);
+    DivStatusCriticalPowerCompare.appendChild(spanCriticalPowerLabelCompare);
+    DivStatusArmaEquipado.appendChild(DivStatusStrengthEquipado)
+    DivStatusArmaEquipado.appendChild(DivStatusDefenseEquipado)
+    DivStatusArmaEquipado.appendChild(DivStatusChanceCriticalEquipado)
+    DivStatusArmaEquipado.appendChild(DivStatusCriticalPowerEquipado)
+    DivStatusArmaCompare.appendChild(DivStatusStrengthCompare)
+    DivStatusArmaCompare.appendChild(DivStatusDefenseCompare)
+    DivStatusArmaCompare.appendChild(DivStatusChanceCriticalCompare)
+    DivStatusArmaCompare.appendChild(DivStatusCriticalPowerCompare)
+    DivPaiEquipCompare.appendChild(DivStatusArmaEquipado)
+    DivPaiEquipCompare.appendChild(DivStatusArmaCompare)
+    DivArmaImgEquipado.appendChild(armaImgEquipado);
+    DivArmaImgCompare.appendChild(armaImgCompare);
+    DivArmasContainer.appendChild(DivArmaImgEquipado);
+    DivArmasContainer.appendChild(DivArmaImgCompare);
+    Comparar.appendChild(closeBtn);
+    Comparar.appendChild(DivArmasContainer);
+    Comparar.appendChild(DivPaiEquipCompare);
+
+    closeBtn.addEventListener('click', () => {
+        Comparar.classList.remove("show");
+        setTimeout(() => {
+            Comparar.remove();
+        }, 1000);
+    });
+
+    setTimeout(() => {
+        Comparar.classList.add("show");
+    }, 10);
+}
+
 // FUNCOES ARMADURAS
 async function BackpackArmaduras() {
     let backpackarmaduras = document.createElement("div");
@@ -1022,13 +1156,13 @@ async function BackpackArmaduras() {
             let allEquipButtons = document.querySelectorAll('.equipar-btn');
 
             if (armadura_equipada === item) {
-                armadura_equipada = null;
+                armadura_equipada = 'Pelado';
                 equiparBtn.innerText = "Equipar";
 
                 // Remover atributos da arma equipada antes de desequipar
                 defense_player -= defense_weapon;
                 updateImgBackpack(ArmaduraContainerBackpack, 'Pelado');
-            } else if (armadura_equipada != item && armadura_equipada != null) {
+            } else if (armadura_equipada != item && armadura_equipada != 'Pelado') {
                 // Guardar os valores da arma antiga antes de equipar a nova
                 let oldWeapon = armadura_equipada;
                 let oldDefense = armas_atributos[oldWeapon]['defesa'];
