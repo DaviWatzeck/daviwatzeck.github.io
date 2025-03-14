@@ -76,8 +76,8 @@ let current_mana = 20.0;
 let current_health = 100.0;
 let health_max = 100.0;
 
-let strength_player = 10.0;
-let defense_player = 5.0;
+let player_strength = 10.0;
+let player_defense = 5.0;
 
 let strength_weapon = 0;
 let defense_weapon = 0;
@@ -891,8 +891,8 @@ async function BackpackArmas() {
                 equiparBtn.innerText = "Equipar";
 
                 // Remover atributos da arma equipada antes de desequipar
-                strength_player -= strength_weapon;
-                defense_player -= defense_weapon;
+                player_strength -= strength_weapon;
+                player_defense -= defense_weapon;
                 await updateImgBackpack(ArmaContainerBackpack, 'Punhos');
             } else if (arma_equipada != item && arma_equipada != 'Punhos') {
                 // Guardar os valores da arma antiga antes de equipar a nova
@@ -901,8 +901,8 @@ async function BackpackArmas() {
                 let oldDefense = armas_atributos[oldWeapon]['defesa'];
 
                 // Remover atributos da arma antiga
-                strength_player -= oldStrength;
-                defense_player -= oldDefense;
+                player_strength -= oldStrength;
+                player_defense -= oldDefense;
 
                 // Equipar nova arma
                 arma_equipada = item;
@@ -910,8 +910,8 @@ async function BackpackArmas() {
                 defense_weapon = armas_atributos[item]['defesa'];
 
                 // Adicionar atributos da nova arma
-                strength_player += strength_weapon;
-                defense_player += defense_weapon;
+                player_strength += strength_weapon;
+                player_defense += defense_weapon;
 
                 allEquipButtons.forEach(btn => btn.innerText = "Equipar");
 
@@ -923,8 +923,8 @@ async function BackpackArmas() {
                 defense_weapon = armas_atributos[item]['defesa'];
 
                 // Adicionar atributos da arma nova
-                strength_player += strength_weapon;
-                defense_player += defense_weapon;
+                player_strength += strength_weapon;
+                player_defense += defense_weapon;
 
                 equiparBtn.innerText = "Desequipar";
                 await updateImgBackpack(ArmaContainerBackpack, item);
@@ -1298,7 +1298,7 @@ async function BackpackArmaduras() {
                 equiparBtn.innerText = "Equipar";
 
                 // Remover atributos da arma equipada antes de desequipar
-                defense_player -= defense_weapon;
+                player_defense -= defense_weapon;
                 updateImgBackpack(ArmaduraContainerBackpack, 'Pelado');
             } else if (armadura_equipada != item && armadura_equipada != 'Pelado') {
                 // Guardar os valores da arma antiga antes de equipar a nova
@@ -1306,14 +1306,14 @@ async function BackpackArmaduras() {
                 let oldDefense = armas_atributos[oldWeapon]['defesa'];
 
                 // Remover atributos da arma antiga
-                defense_player -= oldDefense;
+                player_defense -= oldDefense;
 
                 // Equipar nova arma
                 armadura_equipada = item;
                 defense_weapon = armas_atributos[item]['defesa'];
 
                 // Adicionar atributos da nova arma
-                defense_player += defense_weapon;
+                player_defense += defense_weapon;
 
                 allEquipButtons.forEach(btn => btn.innerText = "Equipar");
 
@@ -1324,7 +1324,7 @@ async function BackpackArmaduras() {
                 defense_weapon = armas_atributos[item]['defesa'];
 
                 // Adicionar atributos da arma nova
-                defense_player += defense_weapon;
+                player_defense += defense_weapon;
 
                 equiparBtn.innerText = "Desequipar";
                 updateImgBackpack(ArmaduraContainerBackpack, item);
@@ -1533,6 +1533,454 @@ async function PreBattle() {
     await createEnemyStatusSection(statusEnemy);
     await createPlayerStatusSection(statusPlayer);
     await createPlayerChoicesSection(playerChoices);
+
+    if (primeiraVez.monstro === true) {  // Corrigido: primeiraVez em vez de primeiravez
+        await createTopBox("/static/pngs/npcs/Rashid.png", [
+            `${npc_trainer} Não se preocupe, vou lhe ensinar tudo sobre como enfrentar um inimigo`,
+        ], 5);
+        await Tutorial_Hunt();
+    } else {
+        await Battle();
+    }
+}
+
+async function Tutorial_Hunt() {
+    // Função para destacar uma div específica e escurecer as outras
+    function destacarDiv(classeDiv, elementosInternos = {}) {
+        const todasClasses = [".dialogues", ".status-enemy", ".status-player", ".player-choices"];
+
+        // Primeiro, escurecer todas as divs e seus filhos
+        todasClasses.forEach(classe => {
+            const elementos = document.querySelectorAll(classe);
+            elementos.forEach(elemento => {
+                elemento.style.opacity = "0.1";
+                elemento.style.zIndex = "1";
+
+                // Escurecer todos os elementos filhos também
+                const filhos = elemento.querySelectorAll("*");
+                filhos.forEach(filho => {
+                    filho.style.opacity = "0.1";
+                });
+            });
+        });
+
+        // Destacar a div principal
+        const divsDestaque = document.querySelectorAll(classeDiv);
+        divsDestaque.forEach(divPrincipal => {
+            divPrincipal.style.opacity = "1";
+            divPrincipal.style.zIndex = "100";
+
+            // Destacar todos os filhos por padrão com opacidade média
+            const filhos = divPrincipal.querySelectorAll("*");
+            filhos.forEach(filho => {
+                filho.style.opacity = "0.5";
+            });
+
+            // Ajustar opacidade de elementos internos específicos se necessário
+            if (Object.keys(elementosInternos).length > 0) {
+                for (const [seletor, opacidade] of Object.entries(elementosInternos)) {
+                    // Destacar os elementos específicos
+                    const elementos = divPrincipal.querySelectorAll(seletor);
+                    elementos.forEach(el => {
+                        el.style.opacity = opacidade;
+
+                        // Destacar também todos os filhos do elemento destacado
+                        const filhosElemento = el.querySelectorAll("*");
+                        filhosElemento.forEach(filho => {
+                            filho.style.opacity = opacidade;
+                        });
+                    });
+                }
+            }
+        });
+    }
+
+    // Função para criar balão de explicação similar ao createTopBox
+    async function criarBalaoExplicacao(classeDiv, mensagens, delay = 30) {
+        const divs = document.querySelectorAll(classeDiv);
+        if (divs.length === 0) return;
+
+        const div = divs[0]; // Pegar o primeiro elemento com a classe
+        const rect = div.getBoundingClientRect();
+
+        // Criar o balão
+        const balao = document.createElement("div");
+        balao.className = "balao-explicacao";
+        balao.style.position = "absolute";
+        balao.style.backgroundColor = "black";
+        balao.style.border = "2px solid white";
+        balao.style.borderRadius = "10px";
+        balao.style.padding = "15px";
+        balao.style.maxWidth = "300px";
+        balao.style.boxShadow = "0 0 15px rgba(0, 123, 255, 0.3)";
+        balao.style.zIndex = "200";
+        balao.style.color = "white";
+        balao.style.fontFamily = "'IM Fell English SC', serif";
+        balao.style.fontSize = "18px";
+        balao.style.transition = "opacity 0.5s ease-in-out";
+        balao.style.opacity = "0";
+
+        // Posicionar o balão à direita ou à esquerda dependendo da posição da div
+        const centroX = rect.left + rect.width / 2;
+        const centroTela = window.innerWidth / 2;
+
+        if (centroX < centroTela) {
+            // Div está mais à esquerda, balão à direita
+            balao.style.left = `${rect.right + 20}px`;
+        } else {
+            // Div está mais à direita, balão à esquerda
+            balao.style.left = `${rect.left - 320}px`;
+        }
+
+        balao.style.top = `${rect.top + rect.height / 2 - 100}px`;
+
+        document.body.appendChild(balao);
+
+        // Efeito de fade-in
+        setTimeout(() => {
+            balao.style.opacity = "1";
+        }, 100);
+
+        // Criar o conteúdo do balão
+        const messageBox = document.createElement("div");
+        messageBox.className = "message-box";
+        messageBox.style.minHeight = "80px";
+        balao.appendChild(messageBox);
+
+        // Criar o botão de próximo (inicialmente oculto)
+        const nextButton = document.createElement("button");
+        nextButton.textContent = "▶";
+        nextButton.className = "next-button";
+        nextButton.style.display = "none";
+        nextButton.style.backgroundColor = "transparent";
+        nextButton.style.border = "none";
+        nextButton.style.color = "white";
+        nextButton.style.fontSize = "20px";
+        nextButton.style.cursor = "pointer";
+        nextButton.style.padding = "10px";
+        nextButton.style.position = "absolute";
+        nextButton.style.right = "10px";
+        nextButton.style.bottom = "10px";
+        balao.appendChild(nextButton);
+
+        // Adicionar efeito hover ao botão
+        nextButton.addEventListener("mouseenter", () => {
+            nextButton.style.color = "gray";
+        });
+        nextButton.addEventListener("mouseleave", () => {
+            nextButton.style.color = "white";
+        });
+
+        let currentIndex = 0;
+
+        // Função para calcular o tempo de leitura baseado no comprimento da mensagem
+        function calcularTempoLeitura(texto) {
+            // Média de leitura: 200 palavras por minuto = 3.33 palavras por segundo
+            // Tempo mínimo: 3 segundos, tempo máximo: 15 segundos
+            const palavras = texto.split(' ').length;
+            const tempoSegundos = Math.max(3, Math.min(15, Math.ceil(palavras / 3)));
+            return tempoSegundos * 1000;
+        }
+
+        // Função para formatar o texto com números em fonte system-ui
+        function formatarTextoComNumeros(texto) {
+            // Dividir o texto em partes (números e não-números)
+            const partes = texto.split(/(\d+(?:\.\d+)?)/g);
+
+            // Criar um elemento para conter o texto formatado
+            const container = document.createElement('div');
+
+            // Adicionar cada parte com a formatação apropriada
+            partes.forEach(parte => {
+                // Verificar se a parte é um número
+                if (/^\d+(?:\.\d+)?$/.test(parte)) {
+                    const span = document.createElement('span');
+                    span.textContent = parte;
+                    span.style.fontFamily = 'system-ui';
+                    container.appendChild(span);
+                } else {
+                    const textNode = document.createTextNode(parte);
+                    container.appendChild(textNode);
+                }
+            });
+
+            return container;
+        }
+
+        // Função para digitar a mensagem letra por letra com formatação de números
+        function typeMessage(index) {
+            if (index >= mensagens.length) {
+                return Promise.resolve();
+            }
+
+            const message = mensagens[index];
+            messageBox.innerHTML = "";
+
+            // Criar um elemento temporário para armazenar o texto formatado
+            const tempContainer = formatarTextoComNumeros(message);
+            const formattedText = tempContainer.innerHTML;
+
+            let charIndex = 0;
+            let currentText = "";
+
+            return new Promise(resolve => {
+                function typeLetter() {
+                    if (charIndex < message.length) {
+                        // Adicionar o próximo caractere
+                        currentText += message[charIndex];
+
+                        // Formatar o texto atual com números em system-ui
+                        const formattedContainer = formatarTextoComNumeros(currentText);
+                        messageBox.innerHTML = formattedContainer.innerHTML;
+
+                        charIndex++;
+                        setTimeout(typeLetter, delay);
+                    } else {
+                        // Se for a última mensagem, mostrar o botão de próximo
+                        if (index === mensagens.length - 1) {
+                            nextButton.style.display = "block";
+                            nextButton.onclick = () => {
+                                balao.style.opacity = "0";
+                                setTimeout(() => {
+                                    balao.remove();
+                                    resolve();
+                                }, 500);
+                            };
+
+                            // Configurar tempo automático para fechar o balão
+                            const tempoLeitura = calcularTempoLeitura(message);
+                            setTimeout(() => {
+                                if (document.body.contains(balao)) {
+                                    balao.style.opacity = "0";
+                                    setTimeout(() => {
+                                        balao.remove();
+                                        resolve();
+                                    }, 500);
+                                }
+                            }, tempoLeitura);
+                        } else {
+                            // Se não for a última mensagem, mostrar o botão de próximo
+                            nextButton.style.display = "block";
+                            nextButton.onclick = () => {
+                                nextButton.style.display = "none";
+                                resolve();
+                            };
+
+                            // Configurar tempo automático para ir para a próxima mensagem
+                            const tempoLeitura = calcularTempoLeitura(message);
+                            setTimeout(() => {
+                                if (nextButton.style.display !== "none") {
+                                    nextButton.style.display = "none";
+                                    resolve();
+                                }
+                            }, tempoLeitura);
+                        }
+                    }
+                }
+
+                typeLetter();
+            }).then(() => typeMessage(index + 1));
+        }
+
+        // Iniciar a digitação da primeira mensagem
+        await typeMessage(0);
+
+        return Promise.resolve();
+    }
+
+    // Tutorial para cada seção
+    try {
+        console.log("Iniciando Tutorial_Hunt");
+
+        // Explicação da seção de diálogos
+        destacarDiv(".dialogues");
+        destacarDiv(".dialogues", {
+            ".dialogue-title": "1",
+            ".dialogue-box": "1"
+        });
+        await criarBalaoExplicacao(".dialogues", [
+            "Esse é o histórico de turno, aqui você pode ver quais foram as ultimas ações das 4 ultimas rodadas.",
+            "Se a mensagem estiver em azul significa que a ação foi sua, se estiver vermelha, significa que o oponente fez alguma ação.",
+            "Cada ação que você faz é um turno, seja bater, defender usar poção ou usar alguma magia."
+        ]);
+
+        // Explicação da seção de status do inimigo - Nome
+        destacarDiv(".status-enemy", {
+            ".enemy-status-box": "1"
+        });
+        await criarBalaoExplicacao(".status-enemy", [
+            "Essas são as informações do seu oponente, mostrando seu nome, seu level e sua vida.",
+            "Sempre que a vida de um oponente chegar a 0, você ganhará o loot que ele carrega consigo e experiência."
+        ]);
+
+        // Explicação da seção de status do inimigo - Imagem
+        destacarDiv(".status-enemy", {
+            ".enemy-image": "1"
+        });
+        await criarBalaoExplicacao(".status-enemy", [
+            "Essa é a imagem do oponente."
+        ]);
+
+        // Explicação da seção de status do jogador - Informações
+        destacarDiv(".status-player", {
+            ".player-info": "1",
+            ".player-status-box": "1",
+            ".player-bar-container:nth-child(2)": "0.5",
+            ".player-bar-container:nth-child(3)": "0.5",
+            ".player-bar-container:nth-child(4)": "0.5",
+            ".player-bar-container:nth-child(5)": "0.5"
+        });
+        await criarBalaoExplicacao(".status-player", [
+            "Player info contém informações como nome e level."
+        ]);
+
+        // Explicação da seção de status do jogador - Barra de HP
+        destacarDiv(".status-player", {
+            ".player-status-box": "1",
+            ".player-info": "0.5",
+            ".player-bar-container:nth-child(2)": "1",
+            ".player-bar-container:nth-child(3)": "0.5",
+            ".player-bar-container:nth-child(4)": "0.5",
+            ".player-bar-container:nth-child(5)": "0.5"
+        });
+        await criarBalaoExplicacao(".status-player", [
+            "A primeira barra indica a sua saúde, sempre que chegar a 0, você morre.",
+            "O jogo tem mecanismo de ressureição através de uma pedra de ressureição. Você só pode encontrar essa pedra através de loot de inimigos.",
+            "Você também tem a possibilidade de usar um frasco de vida para recuperar HP ou usar uma magia de suporte para curar sua vida."
+        ]);
+
+        // Explicação da seção de status do jogador - Barra de Mana
+        destacarDiv(".status-player", {
+            ".player-status-box": "1",
+            ".player-info": "0.5",
+            ".player-bar-container:nth-child(2)": "0.5",
+            ".player-bar-container:nth-child(3)": "1",
+            ".player-bar-container:nth-child(4)": "0.5",
+            ".player-bar-container:nth-child(5)": "0.5"
+        });
+        await criarBalaoExplicacao(".status-player", [
+            "A Segunda barra indica a quantidade de sua mana, você pode usar magias como Ataque, Suporte e Aumento de SKILLS."
+        ]);
+
+        // Explicação da seção de status do jogador - Barra de Defesa
+        destacarDiv(".status-player", {
+            ".player-status-box": "1",
+            ".player-info": "0.5",
+            ".player-bar-container:nth-child(2)": "0.5",
+            ".player-bar-container:nth-child(3)": "0.5",
+            ".player-bar-container:nth-child(4)": "1",
+            ".player-bar-container:nth-child(5)": "0.5"
+        });
+        await criarBalaoExplicacao(".status-player", [
+            "A terceira barra indica CARGAS de Defesa. O mecanismo de defesa aqui é único.",
+            "Sempre que você optar por escolher Defender, você terá uma chance aleatória de reduzir entre 35% ~ 55% o dano do inimigo, 20% de evasão (desviar do ataque), 10% de bloquear o ataque + Stun (bloqueia o ataque inimigo e deixa ele atordoado), 5% de chance de bloquear o ataque e revidar (bloqueia o ataque inimigo e revida 150% do valor do dano ao inimigo).",
+            "Defender adiciona 1 de 3 cargas de defesa. Essas cargas aumentam o dano causado no inimigo em Seu dano + 0,5x (por carga).",
+            "Quando se chega a 3 cargas antes de gastar (ou seja, acumulou 3 defesas seguidas), você dá o seu dano + 1.5x e ainda terá mais 1 rodada."
+        ]);
+
+        // Explicação da seção de status do jogador - Barra de XP
+        destacarDiv(".status-player", {
+            ".player-status-box": "1",
+            ".player-info": "0.5",
+            ".player-bar-container:nth-child(2)": "0.5",
+            ".player-bar-container:nth-child(3)": "0.5",
+            ".player-bar-container:nth-child(4)": "0.5",
+            ".player-bar-container:nth-child(5)": "1"
+        });
+        await criarBalaoExplicacao(".status-player", [
+            "A quarta barra indica a quantidade de XP que você tem e quanto falta para você upar de nível."
+        ]);
+
+        // Explicação da seção de escolhas do jogador - Ataque
+        destacarDiv(".player-choices", {
+            ".Container-Choices-Pai": "1",
+            ".Attack-Container": "1",
+            ".Defense-Container": "0.5",
+            ".Potion-Container": "0.5",
+            ".Spell-Container": "0.5"
+        });
+        await criarBalaoExplicacao(".player-choices", [
+            "Attack Container: Aqui é o botão de atacar o inimigo, os números são baseados na força que você tem + o dano da sua arma + o seu level."
+        ]);
+
+        // Explicação da seção de escolhas do jogador - Defesa
+        destacarDiv(".player-choices", {
+            ".Container-Choices-Pai": "1",
+            ".Attack-Container": "0.5",
+            ".Defense-Container": "1",
+            ".Potion-Container": "0.5",
+            ".Spell-Container": "0.5"
+        });
+        await criarBalaoExplicacao(".player-choices", [
+            "Defense Container: Aqui é o botão de defesa. Sempre que defender, você acumulará cargas de defesa que podem ser gastas da maneira que você achar melhor."
+        ]);
+
+        // Explicação da seção de escolhas do jogador - Poção
+        destacarDiv(".player-choices", {
+            ".Container-Choices-Pai": "1",
+            ".Attack-Container": "0.5",
+            ".Defense-Container": "0.5",
+            ".Potion-Container": "1",
+            ".Spell-Container": "0.5"
+        });
+        await criarBalaoExplicacao(".player-choices", [
+            "Potion Container: Aqui é o botão de poções, clicando você poderá selecionar qual poção quer usar (vida ou mana) e recuperar uma parte."
+        ]);
+
+        // Explicação da seção de escolhas do jogador - Magia
+        destacarDiv(".player-choices", {
+            ".Container-Choices-Pai": "1",
+            ".Attack-Container": "0.5",
+            ".Defense-Container": "0.5",
+            ".Potion-Container": "0.5",
+            ".Spell-Container": "1"
+        });
+        await criarBalaoExplicacao(".player-choices", [
+            "Spell Container: Aqui é o botão de magias, por enquanto você não tem nenhuma, mas ao decorrer do jogo você descobrirá magias de cura, de dano, de aumento de poder, etc..."
+        ]);
+
+        // Restaurar a opacidade de todas as divs
+        const todasClasses = [".dialogues", ".status-enemy", ".status-player", ".player-choices"];
+        todasClasses.forEach(classe => {
+            const elementos = document.querySelectorAll(classe);
+            elementos.forEach(elemento => {
+                elemento.style.opacity = "1";
+                elemento.style.zIndex = "auto";
+
+                // Restaurar opacidade de todos os elementos internos
+                const elementosInternos = elemento.querySelectorAll("*");
+                elementosInternos.forEach(el => {
+                    el.style.opacity = "1";
+                });
+            });
+        });
+
+        // Marcar que o tutorial foi concluído
+        primeiraVez.monstro = false;
+
+        console.log("Tutorial concluído, iniciando Battle()");
+        // Iniciar a batalha
+        await Battle();
+
+    } catch (error) {
+        console.error("Erro durante o tutorial:", error);
+        // Em caso de erro, restaurar a opacidade e iniciar a batalha
+        const todasClasses = [".dialogues", ".status-enemy", ".status-player", ".player-choices"];
+        todasClasses.forEach(classe => {
+            const elementos = document.querySelectorAll(classe);
+            elementos.forEach(elemento => {
+                elemento.style.opacity = "1";
+                elemento.style.zIndex = "auto";
+
+                // Restaurar opacidade de todos os elementos internos
+                const elementosInternos = elemento.querySelectorAll("*");
+                elementosInternos.forEach(el => {
+                    el.style.opacity = "1";
+                });
+            });
+        });
+        await Battle();
+    }
 }
 
 // ================ ## DIV DIALOGUES ## ===================
@@ -2027,20 +2475,6 @@ async function adicionarMensagem(mensagem, tipo = "jogador") {
     dialogueBox.scrollTop = dialogueBox.scrollHeight;
 }
 
-async function principal_menu() {
-    await createTopBox("", [
-        "Olá viajante, bem-vindo ao reino!",
-        "Aqui você encontrará grandes aventuras.",
-        "Está pronto para começar?",
-        "*INPUT_NOME*",
-        `Seja muito bem-vindo à vila, ${player_name}`,
-        "Vamos começar a aventura!",
-        "Alguem se aproxima de você..."
-    ], 5);
-
-    gameplay();
-}
-
 // Função para criar o efeito de fogo com partículas
 function createFireEffect(container) {
     const fireEffect = document.createElement('div');
@@ -2139,4 +2573,18 @@ function updateAttackMultiplier(charges) {
     // Adiciona o multiplicador ao botão de ataque
     const buttonContent = attackContainer.querySelector('.choice-button-content');
     buttonContent.appendChild(multiplier);
+}
+
+async function principal_menu() {
+    await createTopBox("", [
+        "Olá viajante, bem-vindo ao reino!",
+        "Aqui você encontrará grandes aventuras.",
+        "Está pronto para começar?",
+        "*INPUT_NOME*",
+        `Seja muito bem-vindo à vila, ${player_name}`,
+        "Vamos começar a aventura!",
+        "Alguem se aproxima de você..."
+    ], 5);
+
+    gameplay();
 }
